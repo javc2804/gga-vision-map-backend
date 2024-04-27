@@ -1,6 +1,6 @@
-// models/User.js
-const { Sequelize, DataTypes, Model } = require("sequelize");
-const sequelize = new Sequelize("postgres://javier:123456@localhost:5432/test"); // Actualiza con tus propios detalles de conexión
+// models/user.js
+const { DataTypes, Model } = require("sequelize");
+const sequelize = require("../config/database"); // Importa la instancia de Sequelize de database.js
 
 class User extends Model {}
 
@@ -8,12 +8,11 @@ User.init(
   {
     // Define los campos del modelo aquí
     email: {
-      // Cambiado de 'username' a 'email'
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
       validate: {
-        isEmail: true, // Asegura que el valor ingresado es un correo electrónico válido
+        isEmail: true,
       },
     },
     password: {
@@ -22,9 +21,9 @@ User.init(
     },
   },
   {
-    sequelize, // Pasamos la conexión a la base de datos
-    modelName: "User", // Nombramos nuestro modelo
+    sequelize,
+    modelName: "User",
   }
 );
 
-module.exports = { User, sequelize };
+module.exports = User; // Exporta el modelo User

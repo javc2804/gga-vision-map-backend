@@ -1,7 +1,12 @@
 // config/database.js
 const Sequelize = require("sequelize");
 
-module.exports = new Sequelize("test", "javier", "123456", {
-  host: "localhost",
-  dialect: "postgres",
-});
+module.exports = new Sequelize(
+  "visionmap",
+  "transmiranda",
+  "$$Tr4nsM1r4nD4$$",
+  {
+    host: "localhost",
+    dialect: "postgres",
+  }
+);
