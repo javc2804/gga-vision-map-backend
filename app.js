@@ -16,4 +16,4 @@ sequelize
   .then(() => console.log("Tablas creadas"))
   .catch((error) => console.log(error));
 
-app.listen(3000, () => console.log("Server running on port 3000"));
+app.listen(3000, () => console.log("Seerver running on port 3000"));
