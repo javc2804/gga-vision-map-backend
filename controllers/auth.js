@@ -3,6 +3,8 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user"); // Importa el modelo User directamente
 
 exports.register = async (req, res) => {
+  console.log(req.body);
+
   const { email, password } = req.body;
 
   if (!email || !password) {

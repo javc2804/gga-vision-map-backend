@@ -1,11 +1,13 @@
 require("dotenv").config(); // Añade esto para cargar las variables de entorno
 const express = require("express");
+const cors = require("cors"); // Importa cors
 const authRoutes = require("./routes/auth");
 const User = require("./models/user");
 const sequelize = require("./config/database");
 
 const app = express();
 
+app.use(cors()); // Usa cors como middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
