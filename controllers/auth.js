@@ -1,13 +1,12 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const User = require("../models/user"); // Importa el modelo User directamente
+const User = require("../models/user");
 
 exports.register = async (req, res) => {
+  const { name, lastName, role, email, password } = req.body;
   console.log(req.body);
 
-  const { email, password } = req.body;
-
-  if (!email || !password) {
+  if (!name || !lastName || !role || !email || !password) {
     return res.status(400).json({ msg: "Faltan campos requeridos" });
   }
 
@@ -17,7 +16,7 @@ exports.register = async (req, res) => {
       return res.status(400).json({ msg: "El usuario ya existe" });
     }
 
-    user = new User({ email, password });
+    user = new User({ name, lastName, role, email, password });
 
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);

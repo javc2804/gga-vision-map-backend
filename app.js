@@ -15,6 +15,7 @@ app.use("/auth", authRoutes);
 
 // Sincroniza los modelos con la base de datos
 sequelize
+  // .sync({ force: true }) // Super peligroso, esto puede borrar todos los registros al actualizar una columna
   .sync()
   .then(() => console.log("Tablas creadas"))
   .catch((error) => console.log(error));
