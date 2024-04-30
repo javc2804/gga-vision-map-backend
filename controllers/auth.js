@@ -73,11 +73,16 @@ exports.login = async (req, res) => {
         if (user.role === "admin") {
           menu = {
             name: "Gastos",
-            subMenu: ["Lista", "Crear"],
+            subMenu: ["Registro", "Listado"],
+            name: "Almacen",
+            subMenu: ["Notas de entrega", "Inventario"],
+            name: "Usuarios",
+            subMenu: ["Registrar usuario", "Listado de usuarios"],
           };
         } else if (user.role === "store") {
           menu = {
-            name: "Inventario",
+            name: "Almacen",
+            subMenu: ["Notas de entrega", "Inventario"],
           };
         }
 
