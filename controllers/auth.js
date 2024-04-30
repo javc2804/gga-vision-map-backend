@@ -53,18 +53,30 @@ exports.login = async (req, res) => {
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
-      return res.status(400).json({ msg: "Contraseña incorrecta" });
+      return res.status(400).json({ msg: "La Contraseña es incorrecta" });
     }
 
     const payload = { user: { id: user.id } };
+    console.log(user);
+
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
       { expiresIn: 3600 },
       (err, token) => {
         if (err) throw err;
-        res.json({ token });
+        res.json({
+          user: {
+            id: user.id,
+            token,
+            name: user.name,
+            lastName: user.lastName,
+            email: user.email,
+            status: user.status,
+          },
+        });
       }
     );
   } catch (err) {

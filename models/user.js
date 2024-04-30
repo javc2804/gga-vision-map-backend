@@ -31,6 +31,10 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    status: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
   },
   {
     sequelize,
