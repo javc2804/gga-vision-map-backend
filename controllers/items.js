@@ -1,4 +1,3 @@
-// controllers/items.js
 const Item = require("../models/item");
 
 exports.createItem = async (req, res) => {

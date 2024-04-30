@@ -2,6 +2,7 @@ require("dotenv").config(); // Añade esto para cargar las variables de entorno
 const express = require("express");
 const cors = require("cors"); // Importa cors
 const authRoutes = require("./routes/auth");
+const itemRoutes = require("./routes/items");
 const User = require("./models/user");
 const sequelize = require("./config/database");
 
@@ -12,6 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/auth", authRoutes);
+app.use("/item", itemRoutes);
 
 // Sincroniza los modelos con la base de datos
 sequelize
