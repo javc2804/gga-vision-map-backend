@@ -35,6 +35,10 @@ User.init(
       defaultValue: false,
       allowNull: false,
     },
+    token: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     sequelize,

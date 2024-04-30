@@ -122,12 +122,38 @@ exports.forgotPassword = async (req, res) => {
 
     emailOlvidePassword({
       email: user.email,
-      name: user.nombre,
+      name: user.name,
       token: user.token,
     });
 
     res.json({ msg: "Hemos enviado un email con las instrucciones" });
   } catch (error) {
     res.status(500).json({ msg: "Ha ocurrido un error", error: error.message });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  const { token, password } = req.body;
+
+  if (!token || !password) {
+    return res.status(400).json({ msg: "Faltan campos requeridos" });
+  }
+
+  try {
+    let user = await User.findOne({ where: { token } });
+    if (!user) {
+      return res.status(400).json({ msg: "Token inválido o expirado" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+    user.token = null;
+
+    await user.save();
+
+    res.json({ msg: "Contraseña actualizada con éxito" });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Error del servidor");
   }
 };
