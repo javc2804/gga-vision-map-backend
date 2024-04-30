@@ -8,14 +8,13 @@ const sequelize = require("./config/database");
 
 const app = express();
 
-app.use(cors()); // Usa cors como middleware
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/auth", authRoutes);
 app.use("/item", itemRoutes);
 
-// Sincroniza los modelos con la base de datos
 sequelize
   // .sync({ force: true }) // Super peligroso, esto puede borrar todos los registros al actualizar una columna
   .sync()
