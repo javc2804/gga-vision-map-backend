@@ -1,12 +1,12 @@
-// config/database.js
+require("dotenv").config();
 const Sequelize = require("sequelize");
 
 module.exports = new Sequelize(
-  "visionmap",
-  "transmiranda",
-  "$$Tr4nsM1r4nD4$$",
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
   {
-    host: "localhost",
-    dialect: "postgres",
+    host: process.env.DB_HOST,
+    dialect: process.env.DB_DIALECT,
   }
 );

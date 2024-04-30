@@ -1,9 +1,10 @@
 const express = require("express");
-const authController = require("../controllers/auth"); // Asegúrate de que la ruta al controlador de autenticación es correcta
+const authController = require("../controllers/auth");
 
 const router = express.Router();
 
 router.post("/register", authController.register);
 router.post("/login", authController.login);
+router.post("/forgot-password", authController.forgotPassword);
 
 module.exports = router;

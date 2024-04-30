@@ -1,6 +1,8 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const { emailOlvidePassword } = require("../helpers/email.js");
+const generarId = require("../helpers/generarId.js");
 
 exports.register = async (req, res) => {
   const { name, lastName, role, email, password } = req.body;
@@ -102,5 +104,30 @@ exports.login = async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Error del servidor");
+  }
+};
+
+exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  let user = await User.findOne({ where: { email } });
+  if (!user) {
+    const error = new Error("El Usuario no existe");
+    return res.status(404).json({ msg: error.message });
+  }
+
+  try {
+    user.token = generarId();
+    await user.save();
+
+    emailOlvidePassword({
+      email: user.email,
+      name: user.nombre,
+      token: user.token,
+    });
+
+    res.json({ msg: "Hemos enviado un email con las instrucciones" });
+  } catch (error) {
+    res.status(500).json({ msg: "Ha ocurrido un error", error: error.message });
   }
 };
