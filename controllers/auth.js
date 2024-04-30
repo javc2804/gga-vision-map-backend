@@ -48,7 +48,7 @@ exports.login = async (req, res) => {
   try {
     let user = await User.findOne({ where: { email } });
     if (!user) {
-      return res.status(400).json({ msg: "Usuario no encontrado" });
+      return res.status(404).json({ msg: "Usuario no encontrado" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -57,14 +57,30 @@ exports.login = async (req, res) => {
       return res.status(400).json({ msg: "La Contraseña es incorrecta" });
     }
 
-    const payload = { user: { id: user.id } };
+    if (!user.status) {
+      return res.status(403).json({ msg: "Usuario desactivado" });
+    }
 
+    const payload = { user: { id: user.id } };
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
       { expiresIn: 3600 },
       (err, token) => {
         if (err) throw err;
+
+        let menu;
+        if (user.role === "admin") {
+          menu = {
+            name: "Gastos",
+            subMenu: ["Lista", "Crear"],
+          };
+        } else if (user.role === "store") {
+          menu = {
+            name: "Inventario",
+          };
+        }
+
         res.json({
           user: {
             id: user.id,
@@ -73,6 +89,7 @@ exports.login = async (req, res) => {
             lastName: user.lastName,
             email: user.email,
             status: user.status,
+            menu,
           },
         });
       }
