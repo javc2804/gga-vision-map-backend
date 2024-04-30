@@ -4,7 +4,6 @@ const User = require("../models/user");
 
 exports.register = async (req, res) => {
   const { name, lastName, role, email, password } = req.body;
-  console.log(req.body);
 
   if (!name || !lastName || !role || !email || !password) {
     return res.status(400).json({ msg: "Faltan campos requeridos" });
@@ -15,8 +14,8 @@ exports.register = async (req, res) => {
     if (user) {
       return res.status(400).json({ msg: "El usuario ya existe" });
     }
-
-    user = new User({ name, lastName, role, email, password });
+    const status = false;
+    user = new User({ name, lastName, role, email, password, status });
 
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
@@ -59,7 +58,6 @@ exports.login = async (req, res) => {
     }
 
     const payload = { user: { id: user.id } };
-    console.log(user);
 
     jwt.sign(
       payload,

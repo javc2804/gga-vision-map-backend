@@ -1,4 +1,3 @@
-// models/user.js
 const { DataTypes, Model } = require("sequelize");
 const sequelize = require("../config/database");
 
@@ -6,16 +5,11 @@ class User extends Model {}
 
 User.init(
   {
-    // Define los campos del modelo aquí
     name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     lastName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    role: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -31,8 +25,14 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    role: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+
     status: {
       type: DataTypes.BOOLEAN,
+      defaultValue: false,
       allowNull: false,
     },
   },
@@ -42,4 +42,4 @@ User.init(
   }
 );
 
-module.exports = User; // Exporta el modelo User
+module.exports = User;
