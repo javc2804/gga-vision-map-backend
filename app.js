@@ -1,10 +1,12 @@
 import dotenv from "dotenv";
-dotenv.config(); // Añade esto para cargar las variables de entorno
+dotenv.config();
 import express from "express";
-import cors from "cors"; // Importa cors
+import cors from "cors";
 import authRoutes from "./routes/auth.js";
 import transactionRoutes from "./routes/transaction.js";
+import uploadRoutes from "./routes/upload.js"; // Asegúrate de que la ruta sea correcta
 import sequelize from "./config/database.js";
+
 const app = express();
 
 app.use(cors());
@@ -13,9 +15,9 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/auth", authRoutes);
 app.use("/transaction", transactionRoutes);
+app.use("/upload", uploadRoutes); // Agrega esta línea
 
 sequelize
-  // .sync({ force: true }) // Super peligroso, esto puede borrar todos los registros al actualizar una columna
   .sync()
   .then(() => console.log("Tablas creadas"))
   .catch((error) => console.log(error));
