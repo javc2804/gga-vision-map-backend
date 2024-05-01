@@ -73,19 +73,43 @@ const login = async (req, res) => {
 
         let menu;
         if (user.role === "admin") {
-          menu = {
-            name: "Gastos",
-            subMenu: ["Registro", "Listado"],
-            name: "Almacen",
-            subMenu: ["Notas de entrega", "Inventario"],
-            name: "Usuarios",
-            subMenu: ["Registrar usuario", "Listado de usuarios"],
-          };
+          menu = [
+            {
+              name: "Gastos",
+              icon: "Money",
+              subMenu: [
+                { name: "Registro", icon: "AddBox" },
+                { name: "Listado", icon: "List" },
+              ],
+            },
+            {
+              name: "Almacen",
+              icon: "Store",
+              subMenu: [
+                { name: "Notas de entrega", icon: "Note" },
+                { name: "Inventario", icon: "Inventory" },
+              ],
+            },
+            {
+              name: "Usuarios",
+              icon: "People",
+              subMenu: [
+                { name: "Registrar usuario", icon: "PersonAdd" },
+                { name: "Listado de usuarios", icon: "PeopleOutline" },
+              ],
+            },
+          ];
         } else if (user.role === "store") {
-          menu = {
-            name: "Almacen",
-            subMenu: ["Notas de entrega", "Inventario"],
-          };
+          menu = [
+            {
+              name: "Almacen",
+              icon: "Store",
+              subMenu: [
+                { name: "Notas de entrega", icon: "Note" },
+                { name: "Inventario", icon: "Inventory" },
+              ],
+            },
+          ];
         }
 
         res.json({
