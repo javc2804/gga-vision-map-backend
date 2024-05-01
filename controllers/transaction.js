@@ -1,6 +1,6 @@
-const Transaction = require("../models/transaction");
+import Transaction from "../models/transaction.js";
 
-exports.createTransaction = async (req, res) => {
+const createTransaction = async (req, res) => {
   const fields = [
     "registroNumero",
     "idUT",
@@ -39,7 +39,7 @@ exports.createTransaction = async (req, res) => {
   }
 };
 
-exports.getTransaction = async (req, res) => {
+const getTransaction = async (req, res) => {
   try {
     const transaction = await Transaction.findByPk(req.params.id);
     res.json(transaction);
@@ -48,7 +48,7 @@ exports.getTransaction = async (req, res) => {
   }
 };
 
-exports.updateTransaction = async (req, res) => {
+const updateTransaction = async (req, res) => {
   try {
     const transaction = await Transaction.update(req.body, {
       where: { id: req.params.id },
@@ -59,13 +59,20 @@ exports.updateTransaction = async (req, res) => {
   }
 };
 
-exports.deleteTransaction = async (req, res) => {
+const deleteTransaction = async (req, res) => {
   try {
-    await transaction.destroy({
+    await Transaction.destroy({
       where: { id: req.params.id },
     });
     res.json({ message: "transaction deleted" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+};
+
+export {
+  createTransaction,
+  getTransaction,
+  updateTransaction,
+  deleteTransaction,
 };

@@ -1,5 +1,5 @@
-const Sequelize = require("sequelize");
-const db = require("../config/database");
+import { Sequelize } from "sequelize";
+import db from "../config/database.js";
 
 const Transaction = db.define("transaction", {
   registroNumero: {
@@ -100,4 +100,4 @@ db.sync()
   .then(() => console.log("Table created"))
   .catch((error) => console.log("Error: ", error));
 
-module.exports = Transaction;
+export default Transaction;

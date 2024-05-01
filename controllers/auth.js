@@ -1,10 +1,10 @@
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const User = require("../models/user");
-const { emailOlvidePassword } = require("../helpers/email.js");
-const generarId = require("../helpers/generarId.js");
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import User from "../models/user.js";
+import { emailOlvidePassword } from "../helpers/email.js";
+import generarId from "../helpers/generarId.js";
 
-exports.register = async (req, res) => {
+const register = async (req, res) => {
   const { name, lastName, role, email, password } = req.body;
 
   if (!name || !lastName || !role || !email || !password) {
@@ -40,7 +40,7 @@ exports.register = async (req, res) => {
   }
 };
 
-exports.login = async (req, res) => {
+const login = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -107,7 +107,7 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.forgotPassword = async (req, res) => {
+const forgotPassword = async (req, res) => {
   const { email } = req.body;
 
   let user = await User.findOne({ where: { email } });
@@ -132,7 +132,7 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-exports.resetPassword = async (req, res) => {
+const resetPassword = async (req, res) => {
   const { token, password } = req.body;
 
   if (!token || !password) {
@@ -156,4 +156,11 @@ exports.resetPassword = async (req, res) => {
     console.error(error.message);
     res.status(500).send("Error del servidor");
   }
+};
+
+export default {
+  register,
+  login,
+  forgotPassword,
+  resetPassword,
 };

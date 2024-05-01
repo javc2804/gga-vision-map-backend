@@ -1,4 +1,4 @@
-const nodemailer = require("nodemailer");
+import nodemailer from "nodemailer";
 
 const emailOlvidePassword = async (datos) => {
   const { email, name, token } = datos;
@@ -30,4 +30,4 @@ const emailOlvidePassword = async (datos) => {
   });
 };
 
-module.exports = { emailOlvidePassword };
+export { emailOlvidePassword };

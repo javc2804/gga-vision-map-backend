@@ -4,4 +4,4 @@ const generarId = () => {
   return random + fecha;
 };
 
-module.exports = generarId;
+export default generarId;

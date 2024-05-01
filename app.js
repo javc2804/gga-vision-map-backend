@@ -1,10 +1,10 @@
-require("dotenv").config(); // Añade esto para cargar las variables de entorno
-const express = require("express");
-const cors = require("cors"); // Importa cors
-const authRoutes = require("./routes/auth");
-const transactionRoutes = require("./routes/transaction");
-const sequelize = require("./config/database");
-
+import dotenv from "dotenv";
+dotenv.config(); // Añade esto para cargar las variables de entorno
+import express from "express";
+import cors from "cors"; // Importa cors
+import authRoutes from "./routes/auth.js";
+import transactionRoutes from "./routes/transaction.js";
+import sequelize from "./config/database.js";
 const app = express();
 
 app.use(cors());
