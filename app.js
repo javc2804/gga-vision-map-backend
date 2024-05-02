@@ -4,7 +4,8 @@ import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/auth.js";
 import transactionRoutes from "./routes/transaction.js";
-import uploadRoutes from "./routes/upload.js"; // Asegúrate de que la ruta sea correcta
+import uploadRoutes from "./routes/upload.js";
+import combinedDataRoutes from "./routes/combinedDataRoutes.js"; // Nueva línea
 import sequelize from "./config/database.js";
 
 const app = express();
@@ -15,7 +16,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/auth", authRoutes);
 app.use("/transaction", transactionRoutes);
-app.use("/upload", uploadRoutes); // Agrega esta línea
+app.use("/upload", uploadRoutes);
+app.use("/combinedData", combinedDataRoutes); // Nueva línea
 
 sequelize
   .sync()

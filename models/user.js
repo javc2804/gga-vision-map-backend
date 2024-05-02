@@ -29,7 +29,6 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-
     status: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
@@ -42,7 +41,8 @@ User.init(
   },
   {
     sequelize,
-    modelName: "User",
+    modelName: "Users", // Cambia "User" a "Users"
+    tableName: "Users", // Especifica el nombre de la tabla
   }
 );
 

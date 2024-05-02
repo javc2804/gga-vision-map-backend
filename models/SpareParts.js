@@ -15,10 +15,7 @@ SparePart.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    subType: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
+
     status: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
@@ -36,14 +33,16 @@ SparePart.init(
     user_rel: {
       type: DataTypes.INTEGER,
       references: {
-        model: "User", // Asegúrate de que este es el nombre correcto de tu modelo User
+        model: "Users", // Asegúrate de que este es el nombre correcto de tu modelo User
         key: "id",
       },
     },
   },
   {
+    timestamps: false, // Añade esta línea
     sequelize,
     modelName: "SparePart",
+    tableName: "spareparts", // Asegúrate de que este es el nombre exacto de tu tabla en la base de datos
   }
 );
 

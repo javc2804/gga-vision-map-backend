@@ -17,12 +17,18 @@ const register = async (req, res) => {
       return res.status(400).json({ msg: "El usuario ya existe" });
     }
     const status = false;
-    user = new User({ name, lastName, role, email, password, status });
 
     const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-    await user.save();
+    user = await User.create({
+      name,
+      lastName,
+      role,
+      email,
+      password: hashedPassword,
+      status,
+    });
 
     const payload = { user: { id: user.id } };
     jwt.sign(

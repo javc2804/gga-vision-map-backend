@@ -32,14 +32,16 @@ PaymentType.init(
     user_rel: {
       type: DataTypes.INTEGER,
       references: {
-        model: "User", // Asegúrate de que este es el nombre correcto de tu modelo User
+        model: "Users", // Asegúrate de que este es el nombre correcto de tu modelo User
         key: "id",
       },
     },
   },
   {
     sequelize,
+    tableName: "paymenttypes", // Asegúrate de que este es el nombre exacto de tu tabla en la base de datos
     modelName: "PaymentType",
+    timestamps: false, // Añade esta línea
   }
 );
 
