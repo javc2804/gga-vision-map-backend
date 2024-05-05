@@ -1,3 +1,5 @@
+import { Op } from "sequelize";
+
 import Transaction from "../models/transaction.js";
 import NoteInvoice from "../models/note_invoices.js";
 const createTransaction = async (req, res) => {
@@ -67,6 +69,29 @@ const createTransaction = async (req, res) => {
   }
 };
 
+const getFilteredTransactions = async (req, res) => {
+  try {
+    const filters = req.body; // asumimos que los filtros vienen en el cuerpo de la solicitud
+    console.log(filters);
+
+    // construir las condiciones de la consulta
+    const conditions = Object.keys(filters).map((key) => {
+      return { [key]: filters[key] };
+    });
+
+    const transactions = await Transaction.findAll({
+      where: {
+        [Op.and]: conditions, // usa Op.or para una condición OR
+      },
+    });
+
+    res.status(200).json(transactions);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
 const getTransaction = async (req, res) => {
   try {
     const transaction = await Transaction.findByPk(req.params.id);
@@ -103,4 +128,5 @@ export {
   getTransaction,
   updateTransaction,
   deleteTransaction,
+  getFilteredTransactions,
 };
