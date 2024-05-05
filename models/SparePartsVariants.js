@@ -41,7 +41,7 @@ SparePartVariant.init(
   {
     timestamps: false, // Añade esta línea
     sequelize,
-    tableName: "sparepartvariants", // Asegúrate de que este es el nombre exacto de tu tabla en la base de datos
+    tableName: "SparePartVariants", // Asegúrate de que este es el nombre exacto de tu tabla en la base de datos
     modelName: "SparePartVariant",
   }
 );

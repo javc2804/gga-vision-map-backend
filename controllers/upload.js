@@ -16,12 +16,23 @@ const uploadExcel = async (req, res) => {
     // Remove header row
     rows.shift();
 
-    const fleets = rows.map((row) => ({
-      status: row[3] === "Activa", // D1
-      attention: row[4], // E1
-      ut: row[5], // F1
-      // Add other fields as necessary
-    }));
+    // Create an object to track unique rows
+    const uniqueFleets = {};
+
+    rows.forEach((row) => {
+      const fleet = {
+        status: row[3] === "Activa", // D1
+        attention: row[4], // E1
+        ut: row[5], // F1
+        // Add other fields as necessary
+      };
+
+      // Use 'ut' as key to ensure no duplicates
+      uniqueFleets[fleet.ut] = fleet;
+    });
+
+    // Convert the values of the object to an array
+    const fleets = Object.values(uniqueFleets);
 
     const result = await Fleet.bulkCreate(fleets, {
       updateOnDuplicate: ["status", "attention", "ut"],

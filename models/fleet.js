@@ -1,32 +1,27 @@
-import { DataTypes } from "sequelize";
+import Sequelize from "sequelize";
 import sequelize from "../config/database.js";
 
 const Fleet = sequelize.define(
   "Fleet",
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
     ut: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
+      type: Sequelize.STRING,
+      primaryKey: true,
     },
     status: {
-      type: DataTypes.BOOLEAN,
+      type: Sequelize.BOOLEAN,
       allowNull: false,
     },
     attention: {
-      type: DataTypes.STRING(255),
+      type: Sequelize.STRING(255),
       allowNull: false,
     },
     brand: {
-      type: DataTypes.STRING(255),
+      type: Sequelize.STRING(255),
       allowNull: true,
     },
     model: {
-      type: DataTypes.STRING(255),
+      type: Sequelize.STRING(255),
       allowNull: true,
     },
   },
@@ -34,5 +29,8 @@ const Fleet = sequelize.define(
     timestamps: false,
   }
 );
+
+// Sync the model with the database
+sequelize.sync({ force: true });
 
 export default Fleet;

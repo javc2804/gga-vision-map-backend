@@ -7,6 +7,8 @@ import transactionRoutes from "./routes/transaction.js";
 import uploadRoutes from "./routes/upload.js";
 import combinedDataRoutes from "./routes/combinedDataRoutes.js"; // Nueva línea
 import sequelize from "./config/database.js";
+import noteInvoicesRoutes from "./routes/noteInvoices.js";
+import NoteInvoice from "./models/note_invoices.js";
 
 const app = express();
 
@@ -14,12 +16,18 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+NoteInvoice.sync()
+  .then(() => console.log('Table "note_invoices" has been created.'))
+  .catch((error) => console.log("An error occurred:", error));
+
 app.use("/auth", authRoutes);
 app.use("/transaction", transactionRoutes);
 app.use("/upload", uploadRoutes);
-app.use("/combinedData", combinedDataRoutes); // Nueva línea
+app.use("/combinedData", combinedDataRoutes);
+app.use("/note-invoices", noteInvoicesRoutes);
 
 sequelize
+  // .sync({ force: true })
   .sync()
   .then(() => console.log("Tablas creadas"))
   .catch((error) => console.log(error));
