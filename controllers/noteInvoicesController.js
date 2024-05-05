@@ -35,6 +35,19 @@ export const getNoteInvoices = async (req, res) => {
       result[current.note_number].invoices.push({
         ...current.dataValues,
         fleet: current.fleet,
+        precioUnitarioDivisas: "",
+        montoTotalPagoBolivares: "",
+        montoTotalDivisasDeuda: "",
+        precioUnitarioDivisasS: "",
+        montoTotalPagoDivisas: "",
+        fechaEntrega: "",
+        fechaPago: "",
+        ordenPagoNumero: "",
+        ordenCompraServicio: "",
+        ordenCompraServicioFecha: "",
+        notaEntregaNumero: "",
+        estatus: "",
+        observacion: "",
       });
       return result;
     }, {});

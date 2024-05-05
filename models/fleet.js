@@ -31,6 +31,5 @@ const Fleet = sequelize.define(
 );
 
 // Sync the model with the database
-sequelize.sync({ force: true });
 
 export default Fleet;

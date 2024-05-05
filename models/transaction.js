@@ -2,72 +2,86 @@ import { Sequelize } from "sequelize";
 import db from "../config/database.js";
 
 const Transaction = db.define("transaction", {
-  registroNumero: {
+  id: {
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false,
+  },
+  note_number: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  delivered_by: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  quantity: {
     type: Sequelize.INTEGER,
     allowNull: false,
   },
-  idUT: {
+  observation: {
     type: Sequelize.STRING,
     allowNull: false,
   },
-  facturaNotaEntregaNumero: {
+  spare_part: {
     type: Sequelize.STRING,
     allowNull: false,
   },
-  registroProveedor: {
+  spare_part_variant: {
     type: Sequelize.STRING,
     allowNull: false,
   },
-  repuestos: {
+  provider: {
     type: Sequelize.STRING,
     allowNull: false,
   },
-  formaPago: {
+  status: {
+    type: Sequelize.BOOLEAN,
+    allowNull: false,
+  },
+  ut: {
     type: Sequelize.STRING,
     allowNull: false,
   },
-  descripcion: {
-    type: Sequelize.STRING,
+  createdAt: {
+    type: Sequelize.DATE,
     allowNull: false,
   },
-  cantidad: {
-    type: Sequelize.INTEGER,
+  updatedAt: {
+    type: Sequelize.DATE,
     allowNull: false,
   },
-  precioUnitarioBolivares: {
-    type: Sequelize.FLOAT,
-    allowNull: false,
-  },
-  tasaBCV: {
-    type: Sequelize.FLOAT,
+  fleet: {
+    type: Sequelize.JSON,
     allowNull: false,
   },
   precioUnitarioDivisas: {
-    type: Sequelize.FLOAT,
+    type: Sequelize.STRING,
     allowNull: false,
   },
   montoTotalPagoBolivares: {
-    type: Sequelize.FLOAT,
+    type: Sequelize.STRING,
     allowNull: false,
   },
   montoTotalDivisasDeuda: {
-    type: Sequelize.FLOAT,
+    type: Sequelize.STRING,
     allowNull: false,
   },
   precioUnitarioDivisasS: {
-    type: Sequelize.FLOAT,
+    type: Sequelize.STRING,
     allowNull: false,
   },
   montoTotalPagoDivisas: {
-    type: Sequelize.FLOAT,
+    type: Sequelize.STRING,
     allowNull: false,
   },
   fechaEntrega: {
-    type: Sequelize.DATE,
+    type: Sequelize.STRING,
     allowNull: false,
   },
   fechaPago: {
-    type: Sequelize.DATE,
+    type: Sequelize.STRING,
     allowNull: false,
   },
   ordenPagoNumero: {
@@ -79,7 +93,7 @@ const Transaction = db.define("transaction", {
     allowNull: false,
   },
   ordenCompraServicioFecha: {
-    type: Sequelize.DATE,
+    type: Sequelize.STRING,
     allowNull: false,
   },
   notaEntregaNumero: {
@@ -95,9 +109,5 @@ const Transaction = db.define("transaction", {
     allowNull: false,
   },
 });
-
-db.sync()
-  .then(() => console.log("Table created"))
-  .catch((error) => console.log("Error: ", error));
 
 export default Transaction;

@@ -1,41 +1,69 @@
 import Transaction from "../models/transaction.js";
-
+import NoteInvoice from "../models/note_invoices.js";
 const createTransaction = async (req, res) => {
   const fields = [
-    "registroNumero",
-    "idUT",
-    "facturaNotaEntregaNumero",
-    "registroProveedor",
-    "repuestos",
-    "formaPago",
-    "descripcion",
-    "cantidad",
-    "precioUnitarioBolivares",
-    "tasaBCV",
-    "precioUnitarioDivisas",
-    "montoTotalPagoBolivares",
-    "montoTotalDivisasDeuda",
-    "precioUnitarioDivisasS",
-    "montoTotalPagoDivisas",
+    "createdAt",
+    "delivered_by",
+    "estatus",
     "fechaEntrega",
     "fechaPago",
-    "ordenPagoNumero",
+    "fleet",
+    "montoTotalDivisasDeuda",
+    "montoTotalPagoBolivares",
+    "montoTotalPagoDivisas",
+    "notaEntregaNumero",
+    "note_number",
+    "observacion",
+    "observation",
     "ordenCompraServicio",
     "ordenCompraServicioFecha",
-    "notaEntregaNumero",
-    "estatus",
-    "observacion",
+    "ordenPagoNumero",
+    "precioUnitarioDivisas",
+    "precioUnitarioDivisasS",
+    "provider",
+    "quantity",
+    "spare_part",
+    "spare_part_variant",
+    "status",
+    "updatedAt",
+    "ut",
   ];
 
-  if (fields.every((field) => req.body[field])) {
+  if (
+    Array.isArray(req.body) &&
+    req.body.every((transaction) =>
+      fields.every((field) => field in transaction)
+    )
+  ) {
     try {
-      const transaction = await Transaction.create(req.body);
-      res.status(201).json(transaction);
+      const transactionsData = req.body.map((transaction) => ({
+        ...transaction,
+        fechaEntrega: new Date(transaction.fechaEntrega).toISOString(),
+        fechaPago: new Date(transaction.fechaPago).toISOString(),
+        ordenCompraServicioFecha: new Date(
+          transaction.ordenCompraServicioFecha
+        ).toISOString(),
+      }));
+
+      const transactions = await Transaction.bulkCreate(transactionsData);
+
+      const noteNumbers = transactions.map(
+        (transaction) => transaction.note_number
+      );
+      await NoteInvoice.update(
+        { status: true },
+        { where: { note_number: noteNumbers } }
+      );
+      res.status(201).json(transactions);
     } catch (err) {
+      console.log(err);
+
       res.status(500).json({ error: err.message });
     }
   } else {
-    res.status(400).json({ error: "Todos los campos son requeridos" });
+    res.status(400).json({
+      error: "Todos los campos son requeridos en cada objeto del array",
+    });
   }
 };
 
