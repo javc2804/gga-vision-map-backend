@@ -84,7 +84,8 @@ const login = async (req, res) => {
               name: "Gastos",
               icon: "Money",
               subMenu: [
-                { name: "Registro", icon: "AddBox", route: "/" },
+                { name: "Lista NDE", icon: "ListAlt", route: "/" },
+                { name: "Registro", icon: "AddBox", route: "/register-out" },
                 { name: "Listado", icon: "List", route: "/list-purchases" },
               ],
             },

@@ -9,18 +9,22 @@ const Fleet = sequelize.define(
       primaryKey: true,
     },
     status: {
-      type: Sequelize.BOOLEAN,
+      type: Sequelize.STRING,
       allowNull: false,
     },
     attention: {
       type: Sequelize.STRING(255),
       allowNull: false,
     },
-    brand: {
+    eje: {
       type: Sequelize.STRING(255),
       allowNull: true,
     },
-    model: {
+    subeje: {
+      type: Sequelize.STRING(255),
+      allowNull: true,
+    },
+    marcaModelo: {
       type: Sequelize.STRING(255),
       allowNull: true,
     },
@@ -29,7 +33,5 @@ const Fleet = sequelize.define(
     timestamps: false,
   }
 );
-
-// Sync the model with the database
 
 export default Fleet;

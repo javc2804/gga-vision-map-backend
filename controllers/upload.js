@@ -20,10 +20,18 @@ const uploadExcel = async (req, res) => {
     const uniqueFleets = {};
 
     rows.forEach((row) => {
+      // Ignore rows with null 'ut'
+      if (row[0] === null) {
+        return;
+      }
+
       const fleet = {
-        status: row[3] === "Activa", // D1
-        attention: row[4], // E1
-        ut: row[5], // F1
+        status: row[4], // E2
+        attention: row[8], // I2
+        ut: row[0], // A2
+        eje: row[1], // B1
+        subeje: row[2], // C1
+        marcaModelo: row[3], // D1
         // Add other fields as necessary
       };
 
