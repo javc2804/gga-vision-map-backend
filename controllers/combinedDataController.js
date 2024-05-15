@@ -5,7 +5,9 @@ import SparePart from "../models/SpareParts.js";
 
 const getCombinedData = async (req, res) => {
   try {
-    const fleets = await Fleet.findAll({ attributes: ["ut"] });
+    const fleets = await Fleet.findAll({
+      attributes: ["ut", "eje", "subeje", "marcaModelo"],
+    });
     const paymentTypes = await PaymentType.findAll({ attributes: ["types"] });
     const sparePartVariants = await SparePartVariant.findAll({
       attributes: ["variant"],
