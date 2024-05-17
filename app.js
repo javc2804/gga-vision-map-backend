@@ -7,6 +7,7 @@ import transactionRoutes from "./routes/transaction.js";
 import uploadRoutes from "./routes/upload.js";
 import combinedDataRoutes from "./routes/combinedDataRoutes.js"; // Nueva línea
 import sequelize from "./config/database.js";
+import providerRoutes from "./routes/providerRoutes.js";
 import noteInvoicesRoutes from "./routes/noteInvoices.js";
 import NoteInvoice from "./models/note_invoices.js";
 
@@ -25,6 +26,7 @@ app.use("/transaction", transactionRoutes);
 app.use("/upload", uploadRoutes);
 app.use("/combinedData", combinedDataRoutes);
 app.use("/note-invoices", noteInvoicesRoutes);
+app.use("/providers", providerRoutes);
 
 sequelize
   // .sync({ force: true })
