@@ -1,33 +1,28 @@
 import { Op } from "sequelize";
 
 import Transaction from "../models/transaction.js";
-import NoteInvoice from "../models/note_invoices.js";
 const createTransaction = async (req, res) => {
   const fields = [
-    "createdAt",
-    "delivered_by",
-    "estatus",
-    "fechaEntrega",
-    "fechaPago",
-    "fleet",
-    "montoTotalDivisasDeuda",
-    "montoTotalPagoBolivares",
-    "montoTotalPagoDivisas",
-    "notaEntregaNumero",
-    "note_number",
+    "user_rel",
+    "cantidad",
+    "descripcion",
+    "descripcionRepuesto",
+    "eje",
+    "facNDE",
+    "fechaOcOs",
+    "formaPago",
+    "marcaModelo",
+    "montoTotalBs",
+    "montoTotalUsd",
+    "numeroOrdenPago",
     "observacion",
-    "observation",
-    "ordenCompraServicio",
-    "ordenCompraServicioFecha",
-    "ordenPagoNumero",
-    "precioUnitarioDivisas",
-    "precioUnitarioDivisasS",
-    "provider",
-    "quantity",
-    "spare_part",
-    "spare_part_variant",
-    "status",
-    "updatedAt",
+    "ocOs",
+    "precioUnitarioBs",
+    "precioUnitarioUsd",
+    "proveedor",
+    "repuesto",
+    "subeje",
+    "tasaBcv",
     "ut",
   ];
 
@@ -38,24 +33,16 @@ const createTransaction = async (req, res) => {
     )
   ) {
     try {
-      const transactionsData = req.body.map((transaction) => ({
-        ...transaction,
-        fechaEntrega: new Date(transaction.fechaEntrega).toISOString(),
-        fechaPago: new Date(transaction.fechaPago).toISOString(),
-        ordenCompraServicioFecha: new Date(
-          transaction.ordenCompraServicioFecha
-        ).toISOString(),
-      }));
+      const transactionsData = req.body.map((transaction) => {
+        const { id, ...transactionWithoutId } = transaction;
+        return {
+          ...transactionWithoutId,
+          fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
+        };
+      });
 
       const transactions = await Transaction.bulkCreate(transactionsData);
 
-      const noteNumbers = transactions.map(
-        (transaction) => transaction.note_number
-      );
-      await NoteInvoice.update(
-        { status: true },
-        { where: { note_number: noteNumbers } }
-      );
       res.status(201).json(transactions);
     } catch (err) {
       console.log(err);

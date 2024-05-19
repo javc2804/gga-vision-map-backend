@@ -8,103 +8,89 @@ const Transaction = db.define("transaction", {
     autoIncrement: true,
     allowNull: false,
   },
-  note_number: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  delivered_by: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  quantity: {
+  facNDE: {
     type: Sequelize.INTEGER,
     allowNull: false,
   },
-  observation: {
+  proveedor: {
     type: Sequelize.STRING,
-    allowNull: false,
-  },
-  spare_part: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  spare_part_variant: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  provider: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  status: {
-    type: Sequelize.BOOLEAN,
     allowNull: false,
   },
   ut: {
     type: Sequelize.STRING,
     allowNull: false,
   },
-  createdAt: {
+  eje: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  subeje: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  marcaModelo: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  repuesto: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  descripcionRepuesto: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  cantidad: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+  },
+  descripcion: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+
+  formaPago: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  precioUnitarioBs: {
+    type: Sequelize.FLOAT,
+    allowNull: false,
+  },
+  precioUnitarioUsd: {
+    type: Sequelize.FLOAT,
+    allowNull: false,
+  },
+  tasaBcv: {
+    type: Sequelize.FLOAT,
+    allowNull: false,
+  },
+  montoTotalBs: {
+    type: Sequelize.FLOAT,
+    allowNull: false,
+  },
+  montoTotalUsd: {
+    type: Sequelize.FLOAT,
+    allowNull: false,
+  },
+  numeroOrdenPago: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+
+  fechaOcOs: {
     type: Sequelize.DATE,
     allowNull: false,
   },
-  updatedAt: {
-    type: Sequelize.DATE,
-    allowNull: false,
-  },
-  fleet: {
-    type: Sequelize.JSON,
-    allowNull: false,
-  },
-  precioUnitarioDivisas: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  montoTotalPagoBolivares: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  montoTotalDivisasDeuda: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  precioUnitarioDivisasS: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  montoTotalPagoDivisas: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  fechaEntrega: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  fechaPago: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  ordenPagoNumero: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  ordenCompraServicio: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  ordenCompraServicioFecha: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  notaEntregaNumero: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  estatus: {
+  ocOs: {
     type: Sequelize.STRING,
     allowNull: false,
   },
   observacion: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  user_rel: {
     type: Sequelize.STRING,
     allowNull: false,
   },
