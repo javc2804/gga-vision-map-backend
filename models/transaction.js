@@ -8,6 +8,10 @@ const Transaction = db.define("transaction", {
     autoIncrement: true,
     allowNull: false,
   },
+  compromiso: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
   facNDE: {
     type: Sequelize.INTEGER,
     allowNull: false,
@@ -18,19 +22,19 @@ const Transaction = db.define("transaction", {
   },
   ut: {
     type: Sequelize.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   eje: {
     type: Sequelize.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   subeje: {
     type: Sequelize.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   marcaModelo: {
     type: Sequelize.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   repuesto: {
     type: Sequelize.STRING,
@@ -46,7 +50,7 @@ const Transaction = db.define("transaction", {
   },
   descripcion: {
     type: Sequelize.STRING,
-    allowNull: false,
+    allowNull: true,
   },
 
   formaPago: {
@@ -55,7 +59,7 @@ const Transaction = db.define("transaction", {
   },
   precioUnitarioBs: {
     type: Sequelize.FLOAT,
-    allowNull: false,
+    allowNull: true,
   },
   precioUnitarioUsd: {
     type: Sequelize.FLOAT,
@@ -63,11 +67,11 @@ const Transaction = db.define("transaction", {
   },
   tasaBcv: {
     type: Sequelize.FLOAT,
-    allowNull: false,
+    allowNull: true,
   },
   montoTotalBs: {
     type: Sequelize.FLOAT,
-    allowNull: false,
+    allowNull: true,
   },
   montoTotalUsd: {
     type: Sequelize.FLOAT,
@@ -77,7 +81,6 @@ const Transaction = db.define("transaction", {
     type: Sequelize.STRING,
     allowNull: false,
   },
-
   fechaOcOs: {
     type: Sequelize.DATE,
     allowNull: false,

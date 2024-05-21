@@ -55,6 +55,55 @@ const createTransaction = async (req, res) => {
     });
   }
 };
+const createTransactionCompromise = async (req, res) => {
+  const fields = [
+    "user_rel",
+    "cantidad",
+    "descripcion",
+    "descripcionRepuesto",
+    "nde",
+    "fechaOcOs",
+    "formaPago",
+    "montoTotalUsd",
+    "numeroOrdenPago",
+    "observacion",
+    "ocOs",
+    "precioUnitarioUsd",
+    "proveedor",
+    "repuesto",
+    "compromiso",
+  ];
+
+  if (
+    Array.isArray(req.body) &&
+    req.body.every((transaction) =>
+      fields.every((field) => field in transaction)
+    )
+  ) {
+    try {
+      const transactionsData = req.body.map((transaction) => {
+        const { id, nde, ...transactionWithoutId } = transaction;
+        return {
+          ...transactionWithoutId,
+          facNDE: nde,
+          fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
+        };
+      });
+
+      const transactions = await Transaction.bulkCreate(transactionsData);
+
+      res.status(201).json(transactions);
+    } catch (err) {
+      console.log(err);
+
+      res.status(500).json({ error: err.message });
+    }
+  } else {
+    res.status(400).json({
+      error: "Todos los campos son requeridos en cada objeto del array",
+    });
+  }
+};
 
 const getFilteredTransactions = async (req, res) => {
   try {
@@ -116,4 +165,5 @@ export {
   updateTransaction,
   deleteTransaction,
   getFilteredTransactions,
+  createTransactionCompromise,
 };

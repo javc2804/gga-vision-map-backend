@@ -5,11 +5,13 @@ import {
   updateTransaction,
   deleteTransaction,
   getFilteredTransactions,
+  createTransactionCompromise,
 } from "../controllers/transaction.js";
 
 const router = express.Router();
 
 router.post("/", createTransaction);
+router.post("/new-compromise", createTransactionCompromise);
 router.post("/filter", getFilteredTransactions);
 router.get("/:id", getTransaction);
 router.put("/:id", updateTransaction);
