@@ -1,7 +1,7 @@
 import { Sequelize } from "sequelize";
 import db from "../config/database.js";
 
-const Transaction = db.define("transaction", {
+const Transaction = db.define("transactions", {
   id: {
     type: Sequelize.INTEGER,
     primaryKey: true,
@@ -14,7 +14,7 @@ const Transaction = db.define("transaction", {
   },
   facNDE: {
     type: Sequelize.INTEGER,
-    allowNull: false,
+    allowNull: true,
   },
   proveedor: {
     type: Sequelize.STRING,
