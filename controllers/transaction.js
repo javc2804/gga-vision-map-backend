@@ -105,9 +105,6 @@ const createTransactionCompromise = async (req, res) => {
   }
 };
 const createTransactionUpdateCompromise = async (req, res) => {
-  console.log("entro en createTransactionUpdateCompromise");
-  console.log(req.body);
-
   const fields = [
     "user_rel",
     "cantidad",
@@ -124,6 +121,7 @@ const createTransactionUpdateCompromise = async (req, res) => {
     "proveedor",
     "repuesto",
     "compromiso",
+    "id",
   ];
 
   if (
@@ -147,6 +145,15 @@ const createTransactionUpdateCompromise = async (req, res) => {
       });
 
       const transactions = await Transaction.bulkCreate(transactionsData);
+
+      // Update the transaction with the given id
+      const transactionToUpdate = await Transaction.findByPk(req.body[0].id);
+      if (transactionToUpdate) {
+        await transactionToUpdate.update({
+          montoTotalUsd: transactionToUpdate.montoTotalUsd - totalMontoTotalUsd,
+        });
+      }
+
       console.log(totalMontoTotalUsd);
 
       res.status(201).json({ transactions, totalMontoTotalUsd });
