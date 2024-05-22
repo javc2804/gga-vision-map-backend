@@ -136,6 +136,28 @@ const getTransaction = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+const getTransactionCompromise = async (req, res) => {
+  const { id } = req.body;
+
+  try {
+    const transaction = await Transaction.findByPk(id, {
+      attributes: {
+        exclude: [
+          "eje",
+          "subeje",
+          "precioUnitarioBs",
+          "tasaBcv",
+          "ut",
+          "montoTotalBs",
+          "marcaModelo",
+        ],
+      },
+    });
+    res.json(transaction);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 const updateTransaction = async (req, res) => {
   try {
@@ -166,4 +188,5 @@ export {
   deleteTransaction,
   getFilteredTransactions,
   createTransactionCompromise,
+  getTransactionCompromise,
 };

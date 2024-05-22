@@ -10,6 +10,7 @@ import sequelize from "./config/database.js";
 import providerRoutes from "./routes/providerRoutes.js";
 import noteInvoicesRoutes from "./routes/noteInvoices.js";
 import NoteInvoice from "./models/note_invoices.js";
+import path from "path";
 
 const app = express();
 
