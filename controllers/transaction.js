@@ -1,6 +1,7 @@
 import { Op } from "sequelize";
 
 import Transaction from "../models/transaction.js";
+import NoteInvoice from "../models/note_invoices.js";
 const createTransaction = async (req, res) => {
   const fields = [
     "user_rel",
@@ -56,60 +57,60 @@ const createTransaction = async (req, res) => {
   }
 };
 const createTransactionAsing = async (req, res) => {
-  console.log(req.body);
-  return;
+  const totalQuantity = req.body.invoices.reduce(
+    (total, trans) => total + trans.cantidad,
+    0
+  );
 
-  const fields = [
-    "user_rel",
-    "cantidad",
-    "descripcion",
-    "descripcionRepuesto",
-    "eje",
-    "facNDE",
-    "fechaOcOs",
-    "formaPago",
-    "marcaModelo",
-    "montoTotalBs",
-    "montoTotalUsd",
-    "numeroOrdenPago",
-    "observacion",
-    "ocOs",
-    "precioUnitarioBs",
-    "precioUnitarioUsd",
-    "proveedor",
-    "repuesto",
-    "subeje",
-    "tasaBcv",
-    "ut",
-  ];
+  const totalMontoUsd = parseFloat(
+    req.body.invoices
+      .reduce((total, trans) => total + trans.montoTotalUsd, 0)
+      .toFixed(2)
+  );
 
-  if (
-    Array.isArray(req.body) &&
-    req.body.every((transaction) =>
-      fields.every((field) => field in transaction)
-    )
-  ) {
-    try {
-      const transactionsData = req.body.map((transaction) => {
-        const { id, ...transactionWithoutId } = transaction;
-        return {
-          ...transactionWithoutId,
-          fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
-        };
-      });
+  const totalMontoBs = parseFloat(
+    req.body.invoices
+      .reduce((total, trans) => total + trans.montoTotalBs, 0)
+      .toFixed(2)
+  );
 
-      const transactions = await Transaction.bulkCreate(transactionsData);
-
-      res.status(201).json(transactions);
-    } catch (err) {
-      console.log(err);
-
-      res.status(500).json({ error: err.message });
-    }
-  } else {
-    res.status(400).json({
-      error: "Todos los campos son requeridos en cada objeto del array",
+  try {
+    const transaction = await Transaction.findOne({
+      where: { id: req.body.idTransaction },
     });
+    if (!transaction) {
+      return res.status(404).json({ error: "Transaction not found" });
+    }
+    transaction.cantidad -= totalQuantity;
+    transaction.montoTotalUsd -= totalMontoUsd;
+    transaction.montoTotalBs -= totalMontoBs;
+
+    try {
+      await transaction.save();
+    } catch (saveErr) {
+      console.log(saveErr);
+      return res.status(500).json({ error: saveErr.message });
+    }
+
+    const transactionsData = req.body.invoices.map((transaction) => {
+      const { idTransaction, id, ...transactionWithoutId } = transaction;
+      return {
+        ...transactionWithoutId,
+        fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
+      };
+    });
+
+    const transactions = await Transaction.bulkCreate(transactionsData);
+
+    const noteInvoices = await NoteInvoice.update(
+      { status: true },
+      { where: { note_number: transaction.facNDE } }
+    );
+
+    res.status(201).json(transactions);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: err.message });
   }
 };
 const createTransactionCompromise = async (req, res) => {
@@ -250,8 +251,6 @@ const getFilteredTransactions = async (req, res) => {
 };
 
 const getTransaction = async (req, res) => {
-  console.log("llegue");
-
   try {
     const transaction = await Transaction.findOne({
       where: {
