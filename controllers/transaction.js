@@ -55,6 +55,63 @@ const createTransaction = async (req, res) => {
     });
   }
 };
+const createTransactionAsing = async (req, res) => {
+  console.log(req.body);
+  return;
+
+  const fields = [
+    "user_rel",
+    "cantidad",
+    "descripcion",
+    "descripcionRepuesto",
+    "eje",
+    "facNDE",
+    "fechaOcOs",
+    "formaPago",
+    "marcaModelo",
+    "montoTotalBs",
+    "montoTotalUsd",
+    "numeroOrdenPago",
+    "observacion",
+    "ocOs",
+    "precioUnitarioBs",
+    "precioUnitarioUsd",
+    "proveedor",
+    "repuesto",
+    "subeje",
+    "tasaBcv",
+    "ut",
+  ];
+
+  if (
+    Array.isArray(req.body) &&
+    req.body.every((transaction) =>
+      fields.every((field) => field in transaction)
+    )
+  ) {
+    try {
+      const transactionsData = req.body.map((transaction) => {
+        const { id, ...transactionWithoutId } = transaction;
+        return {
+          ...transactionWithoutId,
+          fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
+        };
+      });
+
+      const transactions = await Transaction.bulkCreate(transactionsData);
+
+      res.status(201).json(transactions);
+    } catch (err) {
+      console.log(err);
+
+      res.status(500).json({ error: err.message });
+    }
+  } else {
+    res.status(400).json({
+      error: "Todos los campos son requeridos en cada objeto del array",
+    });
+  }
+};
 const createTransactionCompromise = async (req, res) => {
   const fields = [
     "user_rel",
@@ -193,8 +250,14 @@ const getFilteredTransactions = async (req, res) => {
 };
 
 const getTransaction = async (req, res) => {
+  console.log("llegue");
+
   try {
-    const transaction = await Transaction.findByPk(req.params.id);
+    const transaction = await Transaction.findOne({
+      where: {
+        facNDE: req.body.id,
+      },
+    });
     res.json(transaction);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -254,4 +317,5 @@ export {
   createTransactionCompromise,
   getTransactionCompromise,
   createTransactionUpdateCompromise,
+  createTransactionAsing,
 };

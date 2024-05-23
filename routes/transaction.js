@@ -8,14 +8,17 @@ import {
   createTransactionCompromise,
   getTransactionCompromise,
   createTransactionUpdateCompromise,
+  createTransactionAsing,
 } from "../controllers/transaction.js";
 
 const router = express.Router();
 
 router.post("/", createTransaction);
+router.post("/asing", createTransactionAsing);
+router.post("/get-transaction", getTransaction);
 router.post("/new-compromise", createTransactionCompromise);
 router.post("/filter", getFilteredTransactions);
-router.get("/:id", getTransaction);
+// router.get("/:id", getTransaction);
 router.post("/compromise", getTransactionCompromise);
 router.post("/trans-compromise", createTransactionUpdateCompromise);
 router.put("/:id", updateTransaction);

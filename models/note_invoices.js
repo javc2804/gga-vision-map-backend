@@ -31,7 +31,6 @@ const NoteInvoice = sequelize.define("note_invoices", {
     allowNull: false,
   },
   status: {
-    // Nueva columna
     type: Sequelize.BOOLEAN,
     allowNull: false,
     defaultValue: false,
@@ -39,6 +38,15 @@ const NoteInvoice = sequelize.define("note_invoices", {
   ut: {
     type: Sequelize.STRING,
     allowNull: false,
+  },
+  eje: {
+    type: Sequelize.STRING,
+  },
+  subeje: {
+    type: Sequelize.STRING,
+  },
+  marcaModelo: {
+    type: Sequelize.STRING,
   },
 });
 
