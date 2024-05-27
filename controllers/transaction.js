@@ -194,6 +194,11 @@ const createTransactionUpdateCompromise = async (req, res) => {
         0
       );
 
+      const totalCantidad = req.body.reduce(
+        (total, transaction) => total + Number(transaction.cantidad),
+        0
+      );
+
       const transactionsData = req.body.map((transaction) => {
         const { id, nde, ...transactionWithoutId } = transaction;
         return {
@@ -209,12 +214,13 @@ const createTransactionUpdateCompromise = async (req, res) => {
       if (transactionToUpdate) {
         await transactionToUpdate.update({
           montoTotalUsd: transactionToUpdate.montoTotalUsd - totalMontoTotalUsd,
+          cantidad: transactionToUpdate.cantidad - totalCantidad,
         });
       }
 
-      console.log(totalMontoTotalUsd);
+      console.log(totalMontoTotalUsd, totalCantidad);
 
-      res.status(201).json({ transactions, totalMontoTotalUsd });
+      res.status(201).json({ transactions, totalMontoTotalUsd, totalCantidad });
     } catch (err) {
       console.log(err);
 
@@ -267,17 +273,17 @@ const getTransactionCompromise = async (req, res) => {
 
   try {
     const transaction = await Transaction.findByPk(id, {
-      attributes: {
-        exclude: [
-          "eje",
-          "subeje",
-          "precioUnitarioBs",
-          "tasaBcv",
-          "ut",
-          "montoTotalBs",
-          "marcaModelo",
-        ],
-      },
+      // attributes: {
+      //   exclude: [
+      //     "eje",
+      //     "subeje",
+      //     "precioUnitarioBs",
+      //     "tasaBcv",
+      //     "ut",
+      //     "montoTotalBs",
+      //     "marcaModelo",
+      //   ],
+      // },
     });
     res.json(transaction);
   } catch (err) {
