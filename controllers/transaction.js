@@ -314,13 +314,17 @@ const deleteTransaction = async (req, res) => {
 };
 const getListTransaction = async (req, res) => {
   try {
-    const { startDate, endDate } = req.body;
+    const { startDate, endDate, page = 1, limit = 10 } = req.body;
+    const offset = (page - 1) * limit;
     const transactions = await Transaction.findAll({
       where: {
         createdAt: {
           [Op.between]: [new Date(startDate), new Date(endDate)],
         },
       },
+      order: [["createdAt", "DESC"]],
+      limit: limit,
+      offset: offset,
     });
     res.json(transactions);
   } catch (err) {
