@@ -77,6 +77,10 @@ const Transaction = db.define("transactions", {
     type: Sequelize.FLOAT,
     allowNull: false,
   },
+  deudaTotalUsd: {
+    type: Sequelize.FLOAT,
+    allowNull: false,
+  },
   numeroOrdenPago: {
     type: Sequelize.STRING,
     allowNull: false,
