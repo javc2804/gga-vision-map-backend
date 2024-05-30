@@ -312,6 +312,21 @@ const deleteTransaction = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+const getListTransaction = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.body;
+    const transactions = await Transaction.findAll({
+      where: {
+        createdAt: {
+          [Op.between]: [new Date(startDate), new Date(endDate)],
+        },
+      },
+    });
+    res.json(transactions);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 export {
   createTransaction,
@@ -323,4 +338,5 @@ export {
   getTransactionCompromise,
   createTransactionUpdateCompromise,
   createTransactionAsing,
+  getListTransaction,
 };
