@@ -18,7 +18,7 @@ const Transaction = db.define("transactions", {
   },
   proveedor: {
     type: Sequelize.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   ut: {
     type: Sequelize.STRING,
@@ -36,20 +36,20 @@ const Transaction = db.define("transactions", {
     type: Sequelize.STRING,
     allowNull: true,
   },
+  descripcion: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
   repuesto: {
     type: Sequelize.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   descripcionRepuesto: {
     type: Sequelize.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   cantidad: {
     type: Sequelize.INTEGER,
-    allowNull: false,
-  },
-  descripcion: {
-    type: Sequelize.STRING,
     allowNull: true,
   },
 
@@ -63,10 +63,14 @@ const Transaction = db.define("transactions", {
   },
   precioUnitarioUsd: {
     type: Sequelize.FLOAT,
-    allowNull: false,
+    allowNull: true,
   },
   tasaBcv: {
     type: Sequelize.FLOAT,
+    allowNull: true,
+  },
+  fechaTasa: {
+    type: Sequelize.DATE,
     allowNull: true,
   },
   montoTotalBs: {
@@ -75,26 +79,42 @@ const Transaction = db.define("transactions", {
   },
   montoTotalUsd: {
     type: Sequelize.FLOAT,
-    allowNull: false,
+    allowNull: true,
+  },
+  deudaUnitarioUsd: {
+    type: Sequelize.FLOAT,
+    allowNull: true,
   },
   deudaTotalUsd: {
     type: Sequelize.FLOAT,
-    allowNull: false,
+    allowNull: true,
   },
   numeroOrdenPago: {
     type: Sequelize.STRING,
-    allowNull: false,
+    allowNull: true,
+  },
+  ndeAlmacen: {
+    type: Sequelize.INTEGER,
+    allowNull: true,
+  },
+  fechaEntrega: {
+    type: Sequelize.DATE,
+    allowNull: true,
   },
   fechaOcOs: {
     type: Sequelize.DATE,
-    allowNull: false,
+    allowNull: true,
   },
   ocOs: {
     type: Sequelize.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   observacion: {
     type: Sequelize.STRING,
+    allowNull: true,
+  },
+  status: {
+    type: Sequelize.BOOLEAN,
     allowNull: false,
   },
   user_rel: {
