@@ -94,7 +94,7 @@ const Transaction = db.define("transactions", {
     allowNull: true,
   },
   ndeAlmacen: {
-    type: Sequelize.INTEGER,
+    type: Sequelize.STRING,
     allowNull: true,
   },
   fechaEntrega: {

@@ -41,8 +41,9 @@ const uploadExcelMatriz = async (req, res) => {
         fechaTasa: convertDate(row[57]),
         formaPago: row[13] && row[13] > 0 ? "credito" : "contado",
         ocOs: "",
-        numeroOrdenPago: row[57] || 0,
+        numeroOrdenPago: "",
         fechaOcOs: null,
+        ndeAlmacen: row[58],
         fechaEntrega: convertDate(row[59]),
         observacion: row[60] || "",
         status: true,
@@ -57,21 +58,19 @@ const uploadExcelMatriz = async (req, res) => {
       const result = await Transaction.bulkCreate(transactions);
       console.log(`Inserted ${result.length} rows`);
     } catch (error) {
-      // console.error("Error during insertion:", error);
+      console.error("Error during insertion:", error);
     }
     res.status(200).send("File uploaded and data imported successfully.");
   } catch (error) {
-    // console.error("Error importing data: ", error);
+    console.error("Error importing data: ", error);
     res.status(500).send("Error importing data: " + error.message);
   }
 };
 function convertDate(dateString) {
-  console.log(dateString);
-
   if (typeof dateString !== "string" || dateString.trim() === "") {
     return null;
   }
-  const parts = dateString.split("/");
+  const parts = dateString.replace(/-/g, "/").split("/");
   if (
     parts.length !== 3 ||
     isNaN(parts[0]) ||
@@ -84,7 +83,6 @@ function convertDate(dateString) {
   if (isNaN(date.getTime())) {
     return null;
   }
-  // Ajusta la fecha al formato "yyyy-mm-dd"
   return date.toISOString().split("T")[0];
 }
 
