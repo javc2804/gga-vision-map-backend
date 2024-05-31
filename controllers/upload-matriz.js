@@ -20,30 +20,57 @@ const uploadExcelMatriz = async (req, res) => {
     const uniqueTransactions = {};
     const transactions = [];
 
+    const columnGroups = [
+      [6, 7, 8, 9, 10, 11, 12, 13],
+      [14, 15, 16, 17, 18, 19, 20, 21],
+      [22, 23, 24, 25, 26, 27, 28, 29],
+      [30, 31, 32, 33, 34, 35, 36, 37],
+      [38, 39, 40, 41, 42, 43, 44, 45],
+      [46, 47, 48, 49, 50, 51, 52, 53],
+    ];
+    const indicesDescripcionRepuesto = [6, 14, 22, 30, 38, 46];
+
     rows.forEach((row, index) => {
+      let values = [0, 0, 0, 0, 0, 0, 0, 0]; // Initialize values with an array of zeros
+
+      for (let group of columnGroups) {
+        if (!group.every((idx) => !row[idx] || row[idx] === "0.00")) {
+          values = group.map((idx) => {
+            if (indicesDescripcionRepuesto.includes(idx)) {
+              return row[idx] || "0";
+            } else {
+              return +parseFloat(row[idx] || 0).toFixed(2);
+            }
+          });
+          break;
+        }
+      }
+
       const transaction = {
-        ut: row[1],
-        marcaModelo: row[2],
-        eje: row[3],
-        subeje: row[4],
+        ut: isNaN(row[1]) ? null : row[1],
+        marcaModelo: isNaN(row[2]) ? null : row[2],
+        eje: isNaN(row[3]) ? null : row[3],
+        subeje: isNaN(row[4]) ? null : row[4],
         proveedor: row[5] || "",
         descripcion: "",
-        repuesto: row[6],
-        descripcionRepuesto: row[6],
-        cantidad: row[7] || 0,
-        precioUnitarioBs: +parseFloat(row[8] || 0).toFixed(2),
-        montoTotalBs: +parseFloat(row[9] || 0).toFixed(2),
-        precioUnitarioUsd: +parseFloat(row[10] || 0).toFixed(2),
-        montoTotalUsd: +parseFloat(row[11] || 0).toFixed(2),
-        deudaUnitarioUsd: +parseFloat(row[12] || 0).toFixed(2),
-        deudaTotalUsd: +parseFloat(row[13] || 0).toFixed(2),
+        repuesto: row[6] ? row[6].toString() : null,
+        descripcionRepuesto: indicesDescripcionRepuesto.includes(index)
+          ? row[index] || null
+          : null,
+        cantidad: isNaN(values[1]) ? null : values[1],
+        precioUnitarioBs: isNaN(values[2]) ? null : values[2],
+        montoTotalBs: isNaN(values[3]) ? null : values[3],
+        precioUnitarioUsd: isNaN(values[4]) ? null : values[4],
+        montoTotalUsd: isNaN(values[5]) ? null : values[5],
+        deudaUnitarioUsd: isNaN(values[6]) ? null : values[6],
+        deudaTotalUsd: isNaN(values[7]) ? null : values[7],
         tasaBcv: +parseFloat(row[54] || 0).toFixed(2),
         fechaTasa: convertDate(row[57]),
         formaPago: row[13] && row[13] > 0 ? "credito" : "contado",
         ocOs: "",
         numeroOrdenPago: "",
         fechaOcOs: null,
-        ndeAlmacen: row[58],
+        ndeAlmacen: isNaN(row[58]) ? null : row[58],
         fechaEntrega: convertDate(row[59]),
         observacion: row[60] || "",
         status: true,
@@ -66,6 +93,7 @@ const uploadExcelMatriz = async (req, res) => {
     res.status(500).send("Error importing data: " + error.message);
   }
 };
+
 function convertDate(dateString) {
   if (typeof dateString !== "string" || dateString.trim() === "") {
     return null;
