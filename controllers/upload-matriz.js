@@ -28,16 +28,18 @@ const uploadExcelMatriz = async (req, res) => {
       [38, 39, 40, 41, 42, 43, 44, 45],
       [46, 47, 48, 49, 50, 51, 52, 53],
     ];
-    const indicesDescripcionRepuesto = [6, 14, 22, 30, 38, 46];
+    const indicesDescripcionRepuesto = [6, 15, 23, 31, 39, 47];
 
     rows.forEach((row, index) => {
-      let values = [0, 0, 0, 0, 0, 0, 0, 0]; // Initialize values with an array of zeros
+      let values = [0, 0, 0, 0, 0, 0, 0, 0, 0]; // Initialize values with an array of zeros
+      let descripcionRepuesto = null;
 
       for (let group of columnGroups) {
         if (!group.every((idx) => !row[idx] || row[idx] === "0.00")) {
           values = group.map((idx) => {
             if (indicesDescripcionRepuesto.includes(idx)) {
-              return row[idx] || "0";
+              descripcionRepuesto = row[idx] || null;
+              return descripcionRepuesto;
             } else {
               return +parseFloat(row[idx] || 0).toFixed(2);
             }
@@ -48,22 +50,20 @@ const uploadExcelMatriz = async (req, res) => {
 
       const transaction = {
         ut: isNaN(row[1]) ? null : row[1],
-        marcaModelo: isNaN(row[2]) ? null : row[2],
-        eje: isNaN(row[3]) ? null : row[3],
-        subeje: isNaN(row[4]) ? null : row[4],
+        marcaModelo: row[2] ? row[2] : null,
+        eje: row[3] ? row[3] : null,
+        subeje: row[4] ? row[4] : null,
         proveedor: row[5] || "",
         descripcion: "",
-        repuesto: row[6] ? row[6].toString() : null,
-        descripcionRepuesto: indicesDescripcionRepuesto.includes(index)
-          ? row[index] || null
-          : null,
-        cantidad: isNaN(values[1]) ? null : values[1],
-        precioUnitarioBs: isNaN(values[2]) ? null : values[2],
-        montoTotalBs: isNaN(values[3]) ? null : values[3],
-        precioUnitarioUsd: isNaN(values[4]) ? null : values[4],
-        montoTotalUsd: isNaN(values[5]) ? null : values[5],
-        deudaUnitarioUsd: isNaN(values[6]) ? null : values[6],
-        deudaTotalUsd: isNaN(values[7]) ? null : values[7],
+        descripcionRepuesto: descripcionRepuesto,
+        repuesto: row[7] ? row[7].toString() : null,
+        cantidad: isNaN(values[2]) ? null : values[2],
+        precioUnitarioBs: isNaN(values[3]) ? null : values[3],
+        montoTotalBs: isNaN(values[4]) ? null : values[4],
+        precioUnitarioUsd: isNaN(values[5]) ? null : values[5],
+        montoTotalUsd: isNaN(values[6]) ? null : values[6],
+        deudaUnitarioUsd: isNaN(values[7]) ? null : values[7],
+        deudaTotalUsd: isNaN(values[8]) ? null : values[8],
         tasaBcv: +parseFloat(row[54] || 0).toFixed(2),
         fechaTasa: convertDate(row[57]),
         formaPago: row[13] && row[13] > 0 ? "credito" : "contado",
