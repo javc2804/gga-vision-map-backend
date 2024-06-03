@@ -32,11 +32,11 @@ const uploadExcelMatriz = async (req, res) => {
     const indicesRepuesto = [7, 16, 25, 34, 43, 52];
 
     rows.forEach((row, index) => {
-      let values = [0, 0, 0, 0, 0, 0, 0, 0, 0]; // Initialize values with an array of zeros
-      let descripcionRepuesto = null;
-      let repuesto = null;
-
       for (let group of columnGroups) {
+        let values = [0, 0, 0, 0, 0, 0, 0, 0, 0]; // Initialize values with an array of zeros
+        let descripcionRepuesto = null;
+        let repuesto = null;
+
         if (!group.every((idx) => !row[idx] || row[idx] === "0.00")) {
           values = group.map((idx) => {
             if (indicesDescripcionRepuesto.includes(idx)) {
@@ -46,47 +46,50 @@ const uploadExcelMatriz = async (req, res) => {
               return +parseFloat(row[idx] || 0).toFixed(2);
             }
           });
-          break;
+
+          repuesto = group
+            .map((idx) => {
+              if (indicesRepuesto.includes(idx)) {
+                return row[idx];
+              }
+              return null;
+            })
+            .find((item) => item !== null);
+
+          const transaction = {
+            ut: isNaN(row[1]) ? null : row[1],
+            marcaModelo: row[2] ? row[2] : null,
+            eje: row[3] ? row[3] : null,
+            subeje: row[4] ? row[4] : null,
+            proveedor: row[5] || "",
+            descripcion: "",
+            descripcionRepuesto: descripcionRepuesto,
+            repuesto: repuesto,
+            cantidad: isNaN(values[2]) ? null : values[2],
+            precioUnitarioBs: isNaN(values[3]) ? null : values[3],
+            montoTotalBs: isNaN(values[4]) ? null : values[4],
+            precioUnitarioUsd: isNaN(values[5]) ? null : values[5],
+            montoTotalUsd: isNaN(values[6]) ? null : values[6],
+            deudaUnitarioUsd: isNaN(values[7]) ? null : values[7],
+            deudaTotalUsd: isNaN(values[8]) ? null : values[8],
+            tasaBcv: +parseFloat(row[60] || 0).toFixed(2),
+            fechaTasa: convertDate(row[61]),
+            formaPago:
+              !isNaN(values[8]) && values[8] > 0 ? "credito" : "contado",
+            ocOs: "",
+            numeroOrdenPago: isNaN(row[63]) ? null : row[63],
+            fechaOcOs: null,
+            ndeAlmacen: isNaN(row[64]) ? null : row[64],
+            fechaEntrega: convertDate(row[65]),
+            observacion: row[66] || "",
+            status: true,
+            user_rel: "admin@admin.com",
+          };
+
+          uniqueTransactions[index] = transaction;
+          transactions.push(transaction);
         }
       }
-
-      for (let idx of indicesRepuesto) {
-        if (row[idx]) {
-          repuesto = row[idx].toString();
-          break;
-        }
-      }
-      const transaction = {
-        ut: isNaN(row[1]) ? null : row[1],
-        marcaModelo: row[2] ? row[2] : null,
-        eje: row[3] ? row[3] : null,
-        subeje: row[4] ? row[4] : null,
-        proveedor: row[5] || "",
-        descripcion: "",
-        descripcionRepuesto: descripcionRepuesto,
-        repuesto: repuesto,
-        cantidad: isNaN(values[2]) ? null : values[2],
-        precioUnitarioBs: isNaN(values[3]) ? null : values[3],
-        montoTotalBs: isNaN(values[4]) ? null : values[4],
-        precioUnitarioUsd: isNaN(values[5]) ? null : values[5],
-        montoTotalUsd: isNaN(values[6]) ? null : values[6],
-        deudaUnitarioUsd: isNaN(values[7]) ? null : values[7],
-        deudaTotalUsd: isNaN(values[8]) ? null : values[8],
-        tasaBcv: +parseFloat(row[60] || 0).toFixed(2),
-        fechaTasa: convertDate(row[61]),
-        formaPago: !isNaN(values[8]) && values[8] > 0 ? "credito" : "contado",
-        ocOs: "",
-        numeroOrdenPago: isNaN(row[63]) ? null : row[63],
-        fechaOcOs: null,
-        ndeAlmacen: isNaN(row[64]) ? null : row[64],
-        fechaEntrega: convertDate(row[65]),
-        observacion: row[66] || "",
-        status: true,
-        user_rel: "admin@admin.com",
-      };
-
-      uniqueTransactions[index] = transaction;
-      transactions.push(transaction);
     });
 
     try {
