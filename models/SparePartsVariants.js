@@ -15,19 +15,13 @@ SparePartVariant.init(
       allowNull: false,
       defaultValue: true,
     },
-    created: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
-    updated: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
     sparepartid: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: "SpareParts", // nombre de la tabla a la que hace referencia
+        key: "id", // campo en la tabla SpareParts que sparepartid hace referencia
+      },
     },
     userid: {
       type: DataTypes.INTEGER,
@@ -39,7 +33,6 @@ SparePartVariant.init(
     },
   },
   {
-    timestamps: false, // Añade esta línea
     sequelize,
     tableName: "SparePartVariants", // Asegúrate de que este es el nombre exacto de tu tabla en la base de datos
     modelName: "SparePartVariant",

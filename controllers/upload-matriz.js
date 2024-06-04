@@ -1,6 +1,8 @@
 import multer from "multer";
 import XLSX from "xlsx";
 import Transaction from "../models/transaction.js";
+import Provider from "../models/provider.js"; // Import the Provider model
+import SparePartVariant from "../models/SparePartsVariants.js"; // Importa el modelo
 
 const storage = multer.memoryStorage();
 const uploadMatriz = multer({ storage: storage });
@@ -31,7 +33,20 @@ const uploadExcelMatriz = async (req, res) => {
     const indicesDescripcionRepuesto = [6, 15, 24, 33, 42, 51];
     const indicesRepuesto = [7, 16, 25, 34, 43, 52];
 
-    rows.forEach((row, index) => {
+    // //CON ESTO SE INSERTA PARTES DE REPUESTOS
+
+    // const repuestoToSparepartid = {
+    //   baterias: 1,
+    //   lubricantes: 2,
+    //   cauchos: 3,
+    //   servicios: 4,
+    //   preventivos: 5,
+    //   repuestos: 6,
+    // };
+
+    // //CON ESTO SE INSERTA PARTES DE REPUESTOS
+
+    rows.forEach(async (row, index) => {
       for (let group of columnGroups) {
         let values = [0, 0, 0, 0, 0, 0, 0, 0, 0]; // Initialize values with an array of zeros
         let descripcionRepuesto = null;
@@ -58,13 +73,15 @@ const uploadExcelMatriz = async (req, res) => {
 
           const transaction = {
             ut: isNaN(row[1]) ? null : row[1],
-            marcaModelo: row[2] ? row[2] : null,
-            eje: row[3] ? row[3] : null,
-            subeje: row[4] ? row[4] : null,
-            proveedor: row[5] || "",
+            marcaModelo: row[2] ? row[2].toLowerCase() : null,
+            eje: row[3] ? row[3].toLowerCase() : null,
+            subeje: row[4] ? row[4].toLowerCase() : null,
+            proveedor: row[5] ? row[5].toLowerCase() : "",
             descripcion: "",
-            descripcionRepuesto: descripcionRepuesto,
-            repuesto: repuesto,
+            descripcionRepuesto: descripcionRepuesto
+              ? descripcionRepuesto.toLowerCase()
+              : null,
+            repuesto: repuesto ? repuesto.toLowerCase() : null,
             cantidad: isNaN(values[2]) ? null : values[2],
             precioUnitarioBs: isNaN(values[3]) ? null : values[3],
             montoTotalBs: isNaN(values[4]) ? null : values[4],
@@ -85,6 +102,49 @@ const uploadExcelMatriz = async (req, res) => {
             status: true,
             user_rel: "admin@admin.com",
           };
+
+          // //CON ESTO SE INSERTA PROVEEDORES
+
+          // const providerNameLower = transaction.proveedor.toLowerCase().trim();
+          // let provider = await Provider.findOne({
+          //   where: { name: providerNameLower },
+          // });
+
+          // if (!provider) {
+          //   provider = new Provider({
+          //     name: providerNameLower,
+          //     status: true,
+          //     user_rel: "admin@admin.com",
+          //   });
+          //   try {
+          //     await provider.save();
+          //   } catch (error) {
+          //     console.error("Error during provider insertion:", error);
+          //   }
+          // }
+
+          // //FIN CON ESTO SE INSERTA PROVEEDORES
+
+          // //CON ESTO SE INSERTA PARTES DE REPUESTOS
+
+          // const sparePartVariant = new SparePartVariant({
+          //   variant: descripcionRepuesto
+          //     ? descripcionRepuesto.toLowerCase()
+          //     : null, // Comprueba si descripcionRepuesto es null
+          //   sparepartid: repuestoToSparepartid[repuesto], // Asigna sparepartid basado en repuesto
+          //   createdAt: new Date(), // Añade la fecha actual
+          //   updatedAt: new Date(), // Añade la fecha actual
+          //   status: true,
+          //   userid: 1,
+          // });
+
+          // try {
+          //   await sparePartVariant.save();
+          // } catch (error) {
+          //   console.error("Error during SparePartVariant insertion:", error);
+          // }
+
+          // // FIN DE CON ESTO SE INSERTA PARTES DE REPUESTOS
 
           uniqueTransactions[index] = transaction;
           transactions.push(transaction);
