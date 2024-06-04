@@ -39,6 +39,7 @@ const createTransaction = async (req, res) => {
         return {
           ...transactionWithoutId,
           fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
+          status: true,
         };
       });
 
@@ -145,6 +146,7 @@ const createTransactionCompromise = async (req, res) => {
           ...transactionWithoutId,
           facNDE: nde,
           fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
+          status: true,
         };
       });
 
