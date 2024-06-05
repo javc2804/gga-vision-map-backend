@@ -316,21 +316,25 @@ const deleteTransaction = async (req, res) => {
 };
 const getListTransaction = async (req, res) => {
   try {
-    const { startDate, endDate } = req.body;
-    const page = req.query.page ? parseInt(req.query.page) : 1;
-    const limit = req.query.limit ? parseInt(req.query.limit) : 10;
-    const offset = Math.max(0, (page - 1) * limit);
+    const {
+      startDate,
+      endDate,
+      offset = 0,
+      limit = 10,
+      ...filters
+    } = req.query;
 
     // Aplica los filtros en la consulta a la base de datos
     const where = {
+      ...filters,
       createdAt: {
         [Op.between]: [startDate, endDate],
       },
     };
     const transactions = await Transaction.findAndCountAll({
       where,
-      offset,
-      limit,
+      offset: Number(offset), // Use the offset from the query parameters
+      limit: Number(limit),
       order: [["createdAt", "DESC"]],
     });
     res.json(transactions);
@@ -338,7 +342,6 @@ const getListTransaction = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
 export {
   createTransaction,
   getTransaction,
