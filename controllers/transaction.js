@@ -316,13 +316,7 @@ const deleteTransaction = async (req, res) => {
 };
 const getListTransaction = async (req, res) => {
   try {
-    const {
-      startDate,
-      endDate,
-      offset = 0,
-      limit = 10,
-      ...filters
-    } = req.query;
+    const { startDate, endDate, offset = 0, limit = 5, ...filters } = req.query;
 
     // Aplica los filtros en la consulta a la base de datos
     const where = {
