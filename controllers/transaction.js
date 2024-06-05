@@ -318,9 +318,20 @@ const getListTransaction = async (req, res) => {
   try {
     const { startDate, endDate, offset = 0, limit = 5, ...filters } = req.query;
 
+    // Elimina las propiedades vacías de filters
+    const cleanedFilters = Object.entries(filters).reduce(
+      (acc, [key, value]) => {
+        if (value !== "") {
+          acc[key] = value;
+        }
+        return acc;
+      },
+      {}
+    );
+
     // Aplica los filtros en la consulta a la base de datos
     const where = {
-      ...filters,
+      ...cleanedFilters,
       createdAt: {
         [Op.between]: [startDate, endDate],
       },
