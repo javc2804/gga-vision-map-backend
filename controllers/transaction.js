@@ -329,19 +329,38 @@ const getListTransaction = async (req, res) => {
       {}
     );
 
+    // Extrae min y max de deudaTotalUsd si existen
+    let deudaTotalUsd;
+    if (cleanedFilters.deudaTotalUsd) {
+      const { min, max } = cleanedFilters.deudaTotalUsd;
+      deudaTotalUsd = {
+        [Op.between]: [min, max],
+      };
+      delete cleanedFilters.deudaTotalUsd;
+    }
+
     // Aplica los filtros en la consulta a la base de datos
     const where = {
       ...cleanedFilters,
       createdAt: {
         [Op.between]: [startDate, endDate],
       },
+      ...(deudaTotalUsd && { deudaTotalUsd }),
     };
+
     const transactions = await Transaction.findAndCountAll({
       where,
       offset: Number(offset), // Use the offset from the query parameters
       limit: Number(limit),
       order: [["createdAt", "DESC"]],
     });
+
+    // Calcula la suma total de deudaTotalUsd
+    const totalDeuda = await Transaction.sum("deudaTotalUsd", { where });
+
+    // Agrega totalDeuda a transactions
+    transactions.totalDeuda = totalDeuda;
+
     res.json(transactions);
   } catch (err) {
     res.status(500).json({ error: err.message });
