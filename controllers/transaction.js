@@ -1,5 +1,7 @@
 import { Op } from "sequelize";
 import XLSX from "xlsx";
+import xl from "excel4node";
+
 import Transaction from "../models/transaction.js";
 import fs from "fs";
 import NoteInvoice from "../models/note_invoices.js";
@@ -413,57 +415,151 @@ const getExport = async (req, res) => {
         }
 
         return {
-          "Número de Registro": transaction.id,
-          UT: transaction.ut,
-          "Marca y Modelo": transaction.marcaModelo,
-          Eje: transaction.eje,
-          "Sub-eje": transaction.subeje,
-          "Registro Proveedor": transaction.proveedor,
-          "Descripción repuesto": transaction.descripcionRepuesto,
-          Repuesto: transaction.repuesto,
-          Cantidad: transaction.cantidad,
-          "Precio unitario (Bs)": transaction.precioUnitarioBs,
-          "Monto total (Bs)": transaction.montoTotalBs,
-          "Precio unitario (USD)": transaction.precioUnitarioUsd,
-          "Monto total (USD)": transaction.montoTotalUsd,
-          "Deuda Unitaria (USD)": transaction.deudaUnitariaUsd,
-          "Deuda Total (USD)": transaction.deudaTotalUsd,
-          "Tasa BCV": transaction.tasaBcv,
-          "Fecha de la tasa": transaction.fechaTasa,
-          "OC/OS": transaction.ocOs,
-          "N° de factura/NDE": transaction.facNDE,
-          "Fecha OC/OS": transaction.fechaOcOs,
-          "Forma de pago": transaction.formaPago,
-          "N° de orden de pago": transaction.numeroOrdenPago,
-          "N° de Nota de Entrega": transaction.ndeAlmacen,
-          Compromiso: transaction.compromiso,
-          Observación: transaction.observacion,
+          "Número de Registro": transaction.id ?? "",
+          UT: transaction.ut ?? "",
+          "Marca y Modelo": transaction.marcaModelo ?? "",
+          Eje: transaction.eje ?? "",
+          "Sub-eje": transaction.subeje ?? "",
+          "Registro Proveedor": transaction.proveedor ?? "",
+          "Descripción repuesto": transaction.descripcionRepuesto ?? "",
+          Repuesto: transaction.repuesto ?? "",
+          Cantidad: transaction.cantidad ?? "",
+          "Precio unitario (Bs)": transaction.precioUnitarioBs ?? "",
+          "Monto total (Bs)": transaction.montoTotalBs ?? "",
+          "Precio unitario (USD)": transaction.precioUnitarioUsd ?? "",
+          "Monto total (USD)": transaction.montoTotalUsd ?? "",
+          "Deuda Unitaria (USD)": transaction.deudaUnitariaUsd ?? "",
+          "Deuda Total (USD)": transaction.deudaTotalUsd ?? "",
+          "Tasa BCV": transaction.tasaBcv ?? "",
+          "Fecha de la tasa": transaction.fechaTasa ?? "",
+          "OC/OS": transaction.ocOs ?? "",
+          "N° de factura/NDE": transaction.facNDE ?? "",
+          "Fecha OC/OS": transaction.fechaOcOs ?? "",
+          "Forma de pago": transaction.formaPago ?? "",
+          "N° de orden de pago": transaction.numeroOrdenPago ?? "",
+          "N° de Nota de Entrega": transaction.ndeAlmacen ?? "",
+          Compromiso: transaction.compromiso ?? "",
+          Observación: transaction.observacion ?? "",
         };
       })
       .filter(Boolean);
 
-    const worksheet = XLSX.utils.json_to_sheet(transactionsData);
+    // Create a new instance of a Workbook class
+    const wb = new xl.Workbook();
 
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    // Add Worksheets to the workbook
+    const ws = wb.addWorksheet("Sheet 1");
+
+    // Create a reusable style
+    const headerStyle = wb.createStyle({
+      font: {
+        color: "black",
+        size: 12,
+      },
+      fill: {
+        type: "pattern", // the only one implemented so far.
+        patternType: "solid", // most common.
+        fgColor: "008000", // You can find color definitions at https://www.w3schools.com/colors/colors_names.asp
+      },
+    });
+
+    // Set column widths
+    ws.column(1).setWidth(20);
+    ws.column(2).setWidth(20);
+    ws.column(3).setWidth(20);
+    ws.column(4).setWidth(20);
+    ws.column(5).setWidth(20);
+    ws.column(6).setWidth(20);
+    ws.column(7).setWidth(20);
+    ws.column(8).setWidth(20);
+    ws.column(9).setWidth(20);
+    ws.column(10).setWidth(20);
+    ws.column(11).setWidth(20);
+    ws.column(12).setWidth(20);
+    ws.column(13).setWidth(20);
+    ws.column(14).setWidth(20);
+    ws.column(15).setWidth(20);
+    ws.column(16).setWidth(20);
+    ws.column(17).setWidth(20);
+    // ... repeat for all columns
+    // ... repeat for all columns
+
+    // Set header styles
+    ws.cell(1, 1).string("Número de Registro").style(headerStyle);
+    ws.cell(1, 2).string("UT").style(headerStyle);
+    ws.cell(1, 3).string("Marca/Modelo").style(headerStyle);
+    ws.cell(1, 4).string("Eje").style(headerStyle);
+    ws.cell(1, 5).string("Sub-eje").style(headerStyle);
+    ws.cell(1, 6).string("Proveedor").style(headerStyle);
+    ws.cell(1, 7).string("Repuesto").style(headerStyle);
+    ws.cell(1, 8).string("Descripción repuesto").style(headerStyle);
+    ws.cell(1, 9).string("OC/OS").style(headerStyle);
+    ws.cell(1, 10).string("N° de factura/ND").style(headerStyle);
+    ws.cell(1, 11).string("Fecha OC/OS").style(headerStyle);
+    ws.cell(1, 12).string("Precio unitario (USD)").style(headerStyle);
+    ws.cell(1, 13).string("Cantidad").style(headerStyle);
+    ws.cell(1, 14).string("Monto total (USD)").style(headerStyle);
+    ws.cell(1, 15).string("Forma de pago").style(headerStyle);
+    ws.cell(1, 16).string("N° de orden de pago").style(headerStyle);
+    ws.cell(1, 17).string("Observación").style(headerStyle);
+    // ... repeat for all headers
+
+    // Write data to cells
+    transactionsData.forEach((transaction, index) => {
+      ws.cell(index + 2, 1).number(transaction["Número de Registro"]);
+      ws.cell(index + 2, 2).string(String(transaction["UT"]));
+      ws.cell(index + 2, 3).string(String(transaction["Marca y Modelo"]));
+      ws.cell(index + 2, 4).string(String(transaction["Eje"]));
+      ws.cell(index + 2, 5).string(String(transaction["Sub-eje"]));
+      ws.cell(index + 2, 6).string(String(transaction["Registro Proveedor"]));
+      ws.cell(index + 2, 7).string(String(transaction["Repuesto"]));
+      ws.cell(index + 2, 8).string(String(transaction["Descripción repuesto"]));
+      ws.cell(index + 2, 9).string(String(transaction["OC/OS"]));
+      ws.cell(index + 2, 10).string(String(transaction["N° de factura/NDE"]));
+      ws.cell(index + 2, 11).string(String(transaction["Fecha OC/OS"]));
+      // If `transaction["Precio unitario (USD)"]` is null, write 0 (or any default value) to the cell
+      if (transaction["Precio unitario (USD)"] === "") {
+        ws.cell(index + 2, 12).number(0);
+      } else {
+        ws.cell(index + 2, 12).number(transaction["Precio unitario (USD)"]);
+      }
+      // If `transaction["Cantidad"]` is null, write 0 (or any default value) to the cell
+      if (transaction["Cantidad"] === "") {
+        ws.cell(index + 2, 13).number(0);
+      } else {
+        ws.cell(index + 2, 13).number(transaction["Cantidad"]);
+      }
+      // If `transaction["Monto total (USD)"]` is null, write 0 (or any default value) to the cell
+      if (transaction["Monto total (USD)"] === "") {
+        ws.cell(index + 2, 14).number(0);
+      } else {
+        ws.cell(index + 2, 14).number(transaction["Monto total (USD)"]);
+      }
+      ws.cell(index + 2, 15).string(String(transaction["Forma de pago"]));
+      ws.cell(index + 2, 16).string(transaction["N° de orden de pago"]);
+      ws.cell(index + 2, 17).string(String(transaction["Observación"]));
+    });
 
     // Write the workbook to a file
     const fileName = "reporte.xls";
-    XLSX.writeFile(workbook, fileName);
-
-    // Send the file to the client
-    res.download(fileName, (err) => {
+    wb.write(fileName, (err) => {
       if (err) {
         res.status(500).send({ ok: false, message: err.message });
       } else {
-        fs.unlinkSync(fileName); // delete the file after sending it to the client
+        // Send the file to the client
+        res.download(fileName, (err) => {
+          if (err) {
+            res.status(500).send({ ok: false, message: err.message });
+          } else {
+            fs.unlinkSync(fileName); // delete the file after sending it to the client
+          }
+        });
       }
     });
   } catch (error) {
     res.status(500).send({ ok: false, message: error.message });
   }
 };
-
 export {
   createTransaction,
   getTransaction,
