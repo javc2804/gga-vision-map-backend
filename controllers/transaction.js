@@ -428,7 +428,7 @@ const getExport = async (req, res) => {
           "Monto total (Bs)": transaction.montoTotalBs ?? "",
           "Precio unitario (USD)": transaction.precioUnitarioUsd ?? "",
           "Monto total (USD)": transaction.montoTotalUsd ?? "",
-          "Deuda Unitaria (USD)": transaction.deudaUnitariaUsd ?? "",
+          "Deuda Unitaria (USD)": transaction.deudaUnitarioUsd ?? "",
           "Deuda Total (USD)": transaction.deudaTotalUsd ?? "",
           "Tasa BCV": transaction.tasaBcv ?? "",
           "Fecha de la tasa": transaction.fechaTasa ?? "",
@@ -440,6 +440,7 @@ const getExport = async (req, res) => {
           "N° de Nota de Entrega": transaction.ndeAlmacen ?? "",
           Compromiso: transaction.compromiso ?? "",
           Observación: transaction.observacion ?? "",
+          Usuario: transaction.user_rel ?? "",
         };
       })
       .filter(Boolean);
@@ -480,7 +481,15 @@ const getExport = async (req, res) => {
     ws.column(14).setWidth(20);
     ws.column(15).setWidth(20);
     ws.column(16).setWidth(20);
-    ws.column(17).setWidth(20);
+    ws.column(18).setWidth(20);
+    ws.column(19).setWidth(20);
+    ws.column(20).setWidth(20);
+    ws.column(21).setWidth(20);
+    ws.column(22).setWidth(20);
+    ws.column(23).setWidth(20);
+    ws.column(24).setWidth(20);
+    ws.column(25).setWidth(20);
+    ws.column(26).setWidth(20);
     // ... repeat for all columns
     // ... repeat for all columns
 
@@ -490,54 +499,66 @@ const getExport = async (req, res) => {
     ws.cell(1, 3).string("Marca/Modelo").style(headerStyle);
     ws.cell(1, 4).string("Eje").style(headerStyle);
     ws.cell(1, 5).string("Sub-eje").style(headerStyle);
-    ws.cell(1, 6).string("Proveedor").style(headerStyle);
-    ws.cell(1, 7).string("Repuesto").style(headerStyle);
-    ws.cell(1, 8).string("Descripción repuesto").style(headerStyle);
-    ws.cell(1, 9).string("OC/OS").style(headerStyle);
-    ws.cell(1, 10).string("N° de factura/ND").style(headerStyle);
-    ws.cell(1, 11).string("Fecha OC/OS").style(headerStyle);
+    ws.cell(1, 6).string("Registro Proveedor").style(headerStyle);
+    ws.cell(1, 7).string("Descripción repuesto").style(headerStyle);
+    ws.cell(1, 8).string("Repuesto").style(headerStyle);
+    ws.cell(1, 9).string("Cantidad").style(headerStyle);
+    ws.cell(1, 10).string("Precio unitario (Bs)").style(headerStyle);
+    ws.cell(1, 11).string("Monto total (Bs)").style(headerStyle);
     ws.cell(1, 12).string("Precio unitario (USD)").style(headerStyle);
-    ws.cell(1, 13).string("Cantidad").style(headerStyle);
-    ws.cell(1, 14).string("Monto total (USD)").style(headerStyle);
-    ws.cell(1, 15).string("Forma de pago").style(headerStyle);
-    ws.cell(1, 16).string("N° de orden de pago").style(headerStyle);
-    ws.cell(1, 17).string("Observación").style(headerStyle);
+    ws.cell(1, 13).string("Monto total (USD)").style(headerStyle);
+    ws.cell(1, 14).string("Deuda Unitario (USD)").style(headerStyle);
+    ws.cell(1, 15).string("Deuda total (USD)").style(headerStyle);
+    ws.cell(1, 16).string("Tasa BCV").style(headerStyle);
+    ws.cell(1, 17).string("Fecha de la Tasa").style(headerStyle);
+    ws.cell(1, 18).string("OC/OS").style(headerStyle);
+    ws.cell(1, 19).string("N° de factura/ND").style(headerStyle);
+    ws.cell(1, 20).string("Fecha OC/OS").style(headerStyle);
+    ws.cell(1, 21).string("Forma de pago").style(headerStyle);
+    ws.cell(1, 22).string("N° de orden de pago").style(headerStyle);
+    ws.cell(1, 23).string("N° de Nota de Entrega").style(headerStyle);
+    ws.cell(1, 24).string("Compromiso").style(headerStyle);
+    ws.cell(1, 25).string("Observación").style(headerStyle);
+    ws.cell(1, 26).string("Usuario").style(headerStyle);
     // ... repeat for all headers
 
     // Write data to cells
+    // Write data to cells
     transactionsData.forEach((transaction, index) => {
-      ws.cell(index + 2, 1).number(transaction["Número de Registro"]);
+      ws.cell(index + 2, 1).string(String(transaction["Número de Registro"]));
       ws.cell(index + 2, 2).string(String(transaction["UT"]));
       ws.cell(index + 2, 3).string(String(transaction["Marca y Modelo"]));
       ws.cell(index + 2, 4).string(String(transaction["Eje"]));
       ws.cell(index + 2, 5).string(String(transaction["Sub-eje"]));
       ws.cell(index + 2, 6).string(String(transaction["Registro Proveedor"]));
-      ws.cell(index + 2, 7).string(String(transaction["Repuesto"]));
-      ws.cell(index + 2, 8).string(String(transaction["Descripción repuesto"]));
-      ws.cell(index + 2, 9).string(String(transaction["OC/OS"]));
-      ws.cell(index + 2, 10).string(String(transaction["N° de factura/NDE"]));
-      ws.cell(index + 2, 11).string(String(transaction["Fecha OC/OS"]));
-      // If `transaction["Precio unitario (USD)"]` is null, write 0 (or any default value) to the cell
-      if (transaction["Precio unitario (USD)"] === "") {
-        ws.cell(index + 2, 12).number(0);
-      } else {
-        ws.cell(index + 2, 12).number(transaction["Precio unitario (USD)"]);
-      }
-      // If `transaction["Cantidad"]` is null, write 0 (or any default value) to the cell
-      if (transaction["Cantidad"] === "") {
-        ws.cell(index + 2, 13).number(0);
-      } else {
-        ws.cell(index + 2, 13).number(transaction["Cantidad"]);
-      }
-      // If `transaction["Monto total (USD)"]` is null, write 0 (or any default value) to the cell
-      if (transaction["Monto total (USD)"] === "") {
-        ws.cell(index + 2, 14).number(0);
-      } else {
-        ws.cell(index + 2, 14).number(transaction["Monto total (USD)"]);
-      }
-      ws.cell(index + 2, 15).string(String(transaction["Forma de pago"]));
-      ws.cell(index + 2, 16).string(transaction["N° de orden de pago"]);
-      ws.cell(index + 2, 17).string(String(transaction["Observación"]));
+      ws.cell(index + 2, 7).string(String(transaction["Descripción repuesto"]));
+      ws.cell(index + 2, 8).string(String(transaction["Repuesto"]));
+      ws.cell(index + 2, 9).string(String(transaction["Cantidad"]));
+      ws.cell(index + 2, 10).string(
+        String(transaction["Precio unitario (Bs)"])
+      );
+      ws.cell(index + 2, 11).string(String(transaction["Monto total (Bs)"]));
+      ws.cell(index + 2, 12).string(
+        String(transaction["Precio unitario (USD)"])
+      );
+      ws.cell(index + 2, 13).string(String(transaction["Monto total (USD)"]));
+      ws.cell(index + 2, 14).string(
+        String(transaction["Deuda Unitaria (USD)"])
+      );
+      ws.cell(index + 2, 15).string(String(transaction["Deuda Total (USD)"]));
+      ws.cell(index + 2, 16).string(String(transaction["Tasa BCV"]));
+      ws.cell(index + 2, 17).string(String(transaction["Fecha de la tasa"]));
+      ws.cell(index + 2, 18).string(String(transaction["OC/OS"]));
+      ws.cell(index + 2, 19).string(String(transaction["N° de factura/NDE"]));
+      ws.cell(index + 2, 20).string(String(transaction["Fecha OC/OS"]));
+      ws.cell(index + 2, 21).string(String(transaction["Forma de pago"]));
+      ws.cell(index + 2, 22).string(String(transaction["N° de orden de pago"]));
+      ws.cell(index + 2, 23).string(
+        String(transaction["N° de Nota de Entrega"])
+      );
+      ws.cell(index + 2, 24).string(String(transaction["Compromiso"]));
+      ws.cell(index + 2, 25).string(String(transaction["Observación"]));
+      ws.cell(index + 2, 26).string(String(transaction["Usuario"]));
     });
 
     // Write the workbook to a file
