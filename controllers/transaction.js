@@ -1,6 +1,7 @@
 import { Op } from "sequelize";
-
+import XLSX from "xlsx";
 import Transaction from "../models/transaction.js";
+import fs from "fs";
 import NoteInvoice from "../models/note_invoices.js";
 const createTransaction = async (req, res) => {
   const fields = [
@@ -379,6 +380,66 @@ const getListTransaction = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+const getExport = async (req, res) => {
+  try {
+    const { dataFilters } = req.query;
+    const { startDate, endDate, filters } = dataFilters;
+
+    // Elimina las propiedades vacías de filters
+    const cleanedFilters = Object.entries(filters).reduce(
+      (acc, [key, value]) => {
+        if (value !== "") {
+          acc[key] = value;
+        }
+        return acc;
+      },
+      {}
+    );
+
+    const where = {
+      ...cleanedFilters,
+      createdAt: {
+        [Op.between]: [new Date(startDate), new Date(endDate)],
+      },
+    };
+
+    const transactions = await Transaction.findAll({
+      where,
+      order: [["createdAt", "DESC"]],
+    });
+
+    // Transform transactions into an array of objects with custom headers
+    const transactionsData = transactions.map((transaction) => ({
+      Cantidad: transaction.cantidad,
+      UT: transaction.ut,
+      // add more fields as needed
+    }));
+
+    // Convert the transactions data to a worksheet
+    const worksheet = XLSX.utils.json_to_sheet(transactionsData);
+
+    // Create a new workbook, with the new worksheet
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+    // Write the workbook to a file
+    const fileName = "reporte.xls";
+    XLSX.writeFile(workbook, fileName);
+
+    // Send the file to the client
+    res.download(fileName, (err) => {
+      if (err) {
+        res.status(500).send({ ok: false, message: err.message });
+      } else {
+        fs.unlinkSync(fileName); // delete the file after sending it to the client
+      }
+    });
+  } catch (error) {
+    res.status(500).send({ ok: false, message: error.message });
+  }
+};
+
 export {
   createTransaction,
   getTransaction,
@@ -390,4 +451,5 @@ export {
   createTransactionUpdateCompromise,
   createTransactionAsing,
   getListTransaction,
+  getExport,
 };
