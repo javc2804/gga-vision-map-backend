@@ -329,7 +329,6 @@ const getListTransaction = async (req, res) => {
       {}
     );
 
-    // Extrae min y max de deudaTotalUsd si existen
     let deudaTotalUsd;
     if (cleanedFilters.deudaTotalUsd) {
       const { min, max } = cleanedFilters.deudaTotalUsd;
@@ -355,11 +354,25 @@ const getListTransaction = async (req, res) => {
       order: [["createdAt", "DESC"]],
     });
 
-    // Calcula la suma total de deudaTotalUsd
-    const totalDeuda = await Transaction.sum("deudaTotalUsd", { where });
+    // Calcula las sumas totales, las redondea a dos decimales y las convierte a números
+    const totalDeuda = Number(
+      (await Transaction.sum("deudaTotalUsd", { where })).toFixed(2)
+    );
+    const totalCantidad = Number(
+      (await Transaction.sum("cantidad", { where })).toFixed(2)
+    );
+    const totalMontoUsd = Number(
+      (await Transaction.sum("montoTotalUsd", { where })).toFixed(2)
+    );
+    const totalMontoBs = Number(
+      (await Transaction.sum("montoTotalBs", { where })).toFixed(2)
+    );
 
-    // Agrega totalDeuda a transactions
+    // Agrega las sumas totales a transactions
     transactions.totalDeuda = totalDeuda;
+    transactions.totalCantidad = totalCantidad;
+    transactions.totalMontoUsd = totalMontoUsd;
+    transactions.totalMontoBs = totalMontoBs;
 
     res.json(transactions);
   } catch (err) {
