@@ -386,16 +386,14 @@ const getExport = async (req, res) => {
     const { dataFilters } = req.query;
     const { startDate, endDate, filters } = dataFilters;
 
-    // Elimina las propiedades vacías de filters
-    const cleanedFilters = Object.entries(filters).reduce(
-      (acc, [key, value]) => {
-        if (value !== "") {
-          acc[key] = value;
-        }
-        return acc;
-      },
-      {}
-    );
+    const cleanedFilters = filters
+      ? Object.entries(filters).reduce((acc, [key, value]) => {
+          if (value !== "") {
+            acc[key] = value;
+          }
+          return acc;
+        }, {})
+      : {};
 
     const where = {
       ...cleanedFilters,
@@ -408,18 +406,35 @@ const getExport = async (req, res) => {
       where,
       order: [["createdAt", "DESC"]],
     });
+    const transactionsData = transactions
+      .map((transaction) => {
+        if (!transaction) {
+          return null;
+        }
 
-    // Transform transactions into an array of objects with custom headers
-    const transactionsData = transactions.map((transaction) => ({
-      Cantidad: transaction.cantidad,
-      UT: transaction.ut,
-      // add more fields as needed
-    }));
+        return {
+          UT: transaction.ut,
+          "Marca/Modelo": transaction.marcaModelo,
+          Eje: transaction.eje,
+          "Sub-eje": transaction.subeje,
+          Proveedor: transaction.proveedor,
+          Repuesto: transaction.repuesto,
+          "Descripción repuesto": transaction.descripcionRepuesto,
+          "OC/OS": transaction.ocOs,
+          "N° de factura/ND": transaction.facNDE,
+          "Fecha OC/OS": transaction.fechaOcOs,
+          "Precio unitario (USD)": transaction.precioUnitarioUsd,
+          Cantidad: transaction.cantidad,
+          "Monto total (USD)": transaction.montoTotalUsd,
+          "Forma de pago": transaction.formaPago,
+          "N° de orden de pago": transaction.numeroOrdenPago,
+          Observación: transaction.observacion,
+        };
+      })
+      .filter(Boolean);
 
-    // Convert the transactions data to a worksheet
     const worksheet = XLSX.utils.json_to_sheet(transactionsData);
 
-    // Create a new workbook, with the new worksheet
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 
