@@ -359,30 +359,63 @@ const getListTransaction = async (req, res) => {
       order: [["createdAt", "DESC"]],
     });
 
-    // Calcula las sumas totales, las redondea a dos decimales y las convierte a números
-    const totalDeudaRaw = await Transaction.sum("deudaTotalUsd", { where });
-    const totalDeuda = totalDeudaRaw ? Number(totalDeudaRaw.toFixed(2)) : 0;
+    // Crea los objetos para las sumas de cada categoría
+    const rubrosCantidad = { total: 0 };
+    const rubrosBs = { total: 0 };
+    const rubrosUsd = { total: 0 };
+    const rubrosDeuda = { total: 0 };
 
-    const totalCantidadRaw = await Transaction.sum("cantidad", { where });
-    const totalCantidad = totalCantidadRaw
-      ? Number(totalCantidadRaw.toFixed(2))
-      : 0;
+    // Define las categorías
+    const categories = [
+      "cauchos",
+      "repuestos",
+      "servicios",
+      "preventivos",
+      "lubricantes",
+      "baterias",
+    ];
 
-    const totalMontoUsdRaw = await Transaction.sum("montoTotalUsd", { where });
-    const totalMontoUsd = totalMontoUsdRaw
-      ? Number(totalMontoUsdRaw.toFixed(2))
-      : 0;
+    // Calcula las sumas y conteos para cada categoría
+    for (let category of categories) {
+      const count = await Transaction.count({
+        where: { ...where, repuesto: category },
+      });
+      const sumBs =
+        (await Transaction.sum("montoTotalBs", {
+          where: { ...where, repuesto: category },
+        })) || 0;
+      const sumUsd =
+        (await Transaction.sum("montoTotalUsd", {
+          where: { ...where, repuesto: category },
+        })) || 0;
+      const sumDeuda =
+        (await Transaction.sum("deudaTotalUsd", {
+          where: { ...where, repuesto: category },
+        })) || 0;
 
-    const totalMontoBsRaw = await Transaction.sum("montoTotalBs", { where });
-    const totalMontoBs = totalMontoBsRaw
-      ? Number(totalMontoBsRaw.toFixed(2))
-      : 0;
+      rubrosCantidad[
+        `total${category.charAt(0).toUpperCase() + category.slice(1)}`
+      ] = count;
+      rubrosBs[`total${category.charAt(0).toUpperCase() + category.slice(1)}`] =
+        Number(sumBs.toFixed(2));
+      rubrosUsd[
+        `total${category.charAt(0).toUpperCase() + category.slice(1)}`
+      ] = Number(sumUsd.toFixed(2));
+      rubrosDeuda[
+        `total${category.charAt(0).toUpperCase() + category.slice(1)}`
+      ] = Number(sumDeuda.toFixed(2));
 
-    // Agrega las sumas totales a transactions
-    transactions.totalDeuda = totalDeuda;
-    transactions.totalCantidad = totalCantidad;
-    transactions.totalMontoUsd = totalMontoUsd;
-    transactions.totalMontoBs = totalMontoBs;
+      rubrosCantidad.total += count;
+      rubrosBs.total += sumBs;
+      rubrosUsd.total += sumUsd;
+      rubrosDeuda.total += sumDeuda;
+    }
+
+    // Agrega los objetos a transactions
+    transactions.rubrosCantidad = rubrosCantidad;
+    transactions.rubrosBs = rubrosBs;
+    transactions.rubrosUsd = rubrosUsd;
+    transactions.rubrosDeuda = rubrosDeuda;
 
     res.json(transactions);
   } catch (err) {
