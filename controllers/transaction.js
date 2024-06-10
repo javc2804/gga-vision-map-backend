@@ -149,6 +149,8 @@ const createTransactionCompromise = async (req, res) => {
           ...transactionWithoutId,
           facNDE: nde,
           fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
+          deudaUnitarioUsd: transaction.precioUnitarioUsd,
+          deudaTotalUsd: transaction.montoTotalUsd,
           status: true,
         };
       });
@@ -358,18 +360,23 @@ const getListTransaction = async (req, res) => {
     });
 
     // Calcula las sumas totales, las redondea a dos decimales y las convierte a números
-    const totalDeuda = Number(
-      (await Transaction.sum("deudaTotalUsd", { where })).toFixed(2)
-    );
-    const totalCantidad = Number(
-      (await Transaction.sum("cantidad", { where })).toFixed(2)
-    );
-    const totalMontoUsd = Number(
-      (await Transaction.sum("montoTotalUsd", { where })).toFixed(2)
-    );
-    const totalMontoBs = Number(
-      (await Transaction.sum("montoTotalBs", { where })).toFixed(2)
-    );
+    const totalDeudaRaw = await Transaction.sum("deudaTotalUsd", { where });
+    const totalDeuda = totalDeudaRaw ? Number(totalDeudaRaw.toFixed(2)) : 0;
+
+    const totalCantidadRaw = await Transaction.sum("cantidad", { where });
+    const totalCantidad = totalCantidadRaw
+      ? Number(totalCantidadRaw.toFixed(2))
+      : 0;
+
+    const totalMontoUsdRaw = await Transaction.sum("montoTotalUsd", { where });
+    const totalMontoUsd = totalMontoUsdRaw
+      ? Number(totalMontoUsdRaw.toFixed(2))
+      : 0;
+
+    const totalMontoBsRaw = await Transaction.sum("montoTotalBs", { where });
+    const totalMontoBs = totalMontoBsRaw
+      ? Number(totalMontoBsRaw.toFixed(2))
+      : 0;
 
     // Agrega las sumas totales a transactions
     transactions.totalDeuda = totalDeuda;
