@@ -308,6 +308,17 @@ const updateTransaction = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+const editTransaction = async (req, res) => {
+  try {
+    const { id, ...data } = req.body;
+    const transaction = await Transaction.update(data, {
+      where: { id },
+    });
+    res.json(transaction);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 const deleteTransaction = async (req, res) => {
   try {
@@ -633,4 +644,5 @@ export {
   createTransactionAsing,
   getListTransaction,
   getExport,
+  editTransaction,
 };

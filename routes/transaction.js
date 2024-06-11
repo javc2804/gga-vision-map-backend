@@ -11,6 +11,7 @@ import {
   createTransactionAsing,
   getListTransaction,
   getExport,
+  editTransaction,
 } from "../controllers/transaction.js";
 
 const router = express.Router();
@@ -24,6 +25,7 @@ router.post("/filter", getFilteredTransactions);
 router.post("/compromise", getTransactionCompromise);
 router.post("/trans-compromise", createTransactionUpdateCompromise);
 router.put("/:id", updateTransaction);
+router.post("/edit-purchase", editTransaction);
 router.delete("/:id", deleteTransaction);
 router.get("/list", getListTransaction);
 router.get("/export", getExport);
