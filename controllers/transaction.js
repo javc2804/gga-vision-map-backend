@@ -211,6 +211,7 @@ const createTransactionUpdateCompromise = async (req, res) => {
         return {
           ...transactionWithoutId,
           fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
+          status: true,
         };
       });
 
@@ -225,7 +226,7 @@ const createTransactionUpdateCompromise = async (req, res) => {
         });
       }
 
-      console.log(totalMontoTotalUsd, totalCantidad);
+      // console.log(totalMontoTotalUsd, totalCantidad);
 
       res.status(201).json({ transactions, totalMontoTotalUsd, totalCantidad });
     } catch (err) {
