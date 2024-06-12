@@ -87,6 +87,7 @@ const login = async (req, res) => {
                 { name: "Lista NDE", icon: "ListAlt", route: "/" },
                 { name: "Registro", icon: "AddBox", route: "/register-out/" },
                 { name: "Listado", icon: "List", route: "/list-purchases" },
+                { name: "Gráficos", icon: "BarChart", route: "/graphs-out" },
               ],
             },
             {

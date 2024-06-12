@@ -9,6 +9,7 @@ import combinedDataRoutes from "./routes/combinedDataRoutes.js"; // Nueva línea
 import sequelize from "./config/database.js";
 import providerRoutes from "./routes/providerRoutes.js";
 import downloadTemplateRoutes from "./routes/downloadTemplateRoutes.js";
+import graphOutRoutes from "./routes/graphsOutRoutes.js";
 import noteInvoicesRoutes from "./routes/noteInvoices.js";
 import NoteInvoice from "./models/note_invoices.js";
 import path from "path";
@@ -30,6 +31,7 @@ app.use("/combinedData", combinedDataRoutes);
 app.use("/note-invoices", noteInvoicesRoutes);
 app.use("/providers", providerRoutes);
 app.use("/download-template", downloadTemplateRoutes);
+app.use("/graphs-out", graphOutRoutes);
 
 sequelize
   // .sync({ force: true })
