@@ -5,7 +5,6 @@ import Sequelize from "sequelize";
 
 import NoteInvoice from "../models/note_invoices.js";
 
-// Controlador para crear una nota de factura
 export const createNoteInvoice = async (req, res) => {
   try {
     const noteInvoice = await NoteInvoice.create(req.body);
@@ -14,9 +13,16 @@ export const createNoteInvoice = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 export const getNoteInvoices = async (req, res) => {
   try {
-    const noteInvoices = await NoteInvoice.findAll({
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const offset = (page - 1) * limit;
+
+    const { count, rows: noteInvoices } = await NoteInvoice.findAndCountAll({
+      limit: limit,
+      offset: offset,
       include: [
         {
           model: Fleet,
@@ -24,6 +30,7 @@ export const getNoteInvoices = async (req, res) => {
         },
       ],
     });
+
     const grouped = noteInvoices.reduce((result, current) => {
       result[current.note_number] = result[current.note_number] || {
         note_number: current.note_number,
@@ -61,7 +68,12 @@ export const getNoteInvoices = async (req, res) => {
     }, {});
 
     const groupedArray = Object.values(grouped);
-    res.status(200).json(groupedArray);
+
+    res.status(200).json({
+      total: count,
+      pages: Math.ceil(count / limit),
+      noteInvoices: groupedArray,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
