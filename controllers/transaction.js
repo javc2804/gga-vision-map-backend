@@ -362,6 +362,7 @@ const getListTransaction = async (req, res) => {
         [Op.between]: [startDate, endDate],
       },
       ...(deudaTotalUsd && { deudaTotalUsd }),
+      status: true,
     };
 
     const transactions = await Transaction.findAndCountAll({
@@ -633,6 +634,28 @@ const getExport = async (req, res) => {
     res.status(500).send({ ok: false, message: error.message });
   }
 };
+``;
+
+const deletePurchase = async (req, res) => {
+  try {
+    const ids = req.body; // Asume que 'ids' es un array de IDs
+
+    if (!Array.isArray(ids)) {
+      return res.status(400).json({ error: "ids must be an array" });
+    }
+
+    // Recorre el array de IDs y actualiza cada transacción
+    for (const id of ids) {
+      await Transaction.update({ status: false }, { where: { id: id } });
+    }
+
+    res.status(200).json({ message: "Transactions updated successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export {
   createTransaction,
   getTransaction,
@@ -646,4 +669,5 @@ export {
   getListTransaction,
   getExport,
   editTransaction,
+  deletePurchase,
 };

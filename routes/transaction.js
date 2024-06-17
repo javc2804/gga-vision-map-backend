@@ -12,6 +12,7 @@ import {
   getListTransaction,
   getExport,
   editTransaction,
+  deletePurchase,
 } from "../controllers/transaction.js";
 
 const router = express.Router();
@@ -29,5 +30,6 @@ router.post("/edit-purchase", editTransaction);
 router.delete("/:id", deleteTransaction);
 router.get("/list", getListTransaction);
 router.get("/export", getExport);
+router.post("/delete", deletePurchase);
 
 export default router;
