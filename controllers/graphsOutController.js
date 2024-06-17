@@ -4,7 +4,7 @@ import Transaction from "../models/transaction.js";
 
 const getDataGraph = async (req, res) => {
   try {
-    const { startDate, endDate, ...filters } = req.query;
+    const { startDate, endDate, formaPago, ...filters } = req.query;
 
     const cleanedFilters = Object.entries(filters).reduce(
       (acc, [key, value]) => {
@@ -38,11 +38,19 @@ const getDataGraph = async (req, res) => {
     // Calculate totals for each category without considering the axis
     results["total"] = {};
     for (let category of categories) {
+      const totalField =
+        formaPago === "credito"
+          ? Sequelize.fn("sum", Sequelize.col("deudaTotalUsd"))
+          : formaPago === "" || formaPago === undefined
+          ? Sequelize.fn(
+              "sum",
+              Sequelize.literal('"deudaTotalUsd" + "montoTotalUsd"')
+            )
+          : Sequelize.fn("sum", Sequelize.col("montoTotalUsd"));
+
       const data = await Transaction.findAll({
         where: { ...where, repuesto: category },
-        attributes: [
-          [Sequelize.fn("sum", Sequelize.col("montoTotalUsd")), "total"],
-        ],
+        attributes: [[totalField, "total"]],
       });
 
       results["total"][category] =
@@ -55,11 +63,19 @@ const getDataGraph = async (req, res) => {
     for (let eje of ejes) {
       results[eje] = {};
       for (let category of categories) {
+        const totalField =
+          formaPago === "credito"
+            ? Sequelize.fn("sum", Sequelize.col("deudaTotalUsd"))
+            : formaPago === "" || formaPago === undefined
+            ? Sequelize.fn(
+                "sum",
+                Sequelize.literal('"deudaTotalUsd" + "montoTotalUsd"')
+              )
+            : Sequelize.fn("sum", Sequelize.col("montoTotalUsd"));
+
         const data = await Transaction.findAll({
           where: { ...where, repuesto: category, eje },
-          attributes: [
-            [Sequelize.fn("sum", Sequelize.col("montoTotalUsd")), "total"],
-          ],
+          attributes: [[totalField, "total"]],
         });
 
         results[eje][category] =
