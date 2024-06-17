@@ -7,8 +7,25 @@ import Provider from "../models/provider.js"; // Import the Provider model
 const getCombinedData = async (req, res) => {
   try {
     const fleets = await Fleet.findAll({
-      attributes: ["ut", "eje", "subeje", "marcaModelo"],
+      attributes: ["ut", "marcaModelo"],
     });
+    const eje = (
+      await Fleet.findAll({
+        attributes: ["eje"],
+        group: ["eje"],
+      })
+    )
+      .filter((item) => item.eje)
+      .map((item) => ({ ...item, eje: item.eje.toLowerCase() }));
+
+    const subeje = (
+      await Fleet.findAll({
+        attributes: ["subeje"],
+        group: ["subeje"],
+      })
+    )
+      .filter((item) => item.subeje)
+      .map((item) => ({ ...item, subeje: item.subeje.toLowerCase() }));
     const paymentTypes = await PaymentType.findAll({ attributes: ["types"] });
     const sparePartVariants = await SparePartVariant.findAll({
       attributes: ["variant"],
@@ -18,6 +35,8 @@ const getCombinedData = async (req, res) => {
 
     res.json({
       fleets,
+      eje, // Include the unique eje values
+      subeje, // Include the unique subeje values
       paymentTypes,
       sparePartVariants,
       spareParts,
