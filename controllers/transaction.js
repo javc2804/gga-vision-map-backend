@@ -145,7 +145,7 @@ const createTransactionCompromise = async (req, res) => {
   ) {
     try {
       const transactionsData = req.body.map((transaction) => {
-        const { id, nde, ...transactionWithoutId } = transaction;
+        const { id, nde, ...transactionWithoutId } = transaction; // Remove 'id' from each transaction
         return {
           ...transactionWithoutId,
           facNDE: nde,
