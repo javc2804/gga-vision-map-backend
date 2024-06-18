@@ -391,9 +391,10 @@ const getListTransaction = async (req, res) => {
     delete whereForTotals.repuesto;
 
     for (let category of categories) {
-      const count = await Transaction.count({
-        where: { ...whereForTotals, repuesto: category },
-      });
+      const sumCantidad =
+        (await Transaction.sum("cantidad", {
+          where: { ...whereForTotals, repuesto: category },
+        })) || 0;
       const sumBs =
         (await Transaction.sum("montoTotalBs", {
           where: { ...whereForTotals, repuesto: category },
@@ -409,7 +410,7 @@ const getListTransaction = async (req, res) => {
 
       rubrosCantidad[
         `total${category.charAt(0).toUpperCase() + category.slice(1)}`
-      ] = count;
+      ] = sumCantidad;
       rubrosBs[`total${category.charAt(0).toUpperCase() + category.slice(1)}`] =
         Number(sumBs.toFixed(2));
       rubrosUsd[
@@ -419,7 +420,7 @@ const getListTransaction = async (req, res) => {
         `total${category.charAt(0).toUpperCase() + category.slice(1)}`
       ] = Number(sumDeuda.toFixed(2));
 
-      rubrosCantidad.total += count;
+      rubrosCantidad.total += sumCantidad;
       rubrosBs.total += sumBs;
       rubrosUsd.total += sumUsd;
       rubrosDeuda.total += sumDeuda;
