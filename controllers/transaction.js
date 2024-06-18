@@ -335,7 +335,6 @@ const getListTransaction = async (req, res) => {
   try {
     const { startDate, endDate, offset = 0, limit = 5, ...filters } = req.query;
 
-    // Elimina las propiedades vacías de filters
     const cleanedFilters = Object.entries(filters).reduce(
       (acc, [key, value]) => {
         if (value !== "") {
@@ -355,7 +354,6 @@ const getListTransaction = async (req, res) => {
       delete cleanedFilters.deudaTotalUsd;
     }
 
-    // Aplica los filtros en la consulta a la base de datos
     const where = {
       ...cleanedFilters,
       createdAt: {
@@ -388,22 +386,25 @@ const getListTransaction = async (req, res) => {
       "baterias",
     ];
 
-    // Calcula las sumas y conteos para cada categoría
+    // Crea una copia de 'where' sin el filtro 'repuesto'
+    const whereForTotals = { ...where };
+    delete whereForTotals.repuesto;
+
     for (let category of categories) {
       const count = await Transaction.count({
-        where: { ...where, repuesto: category },
+        where: { ...whereForTotals, repuesto: category },
       });
       const sumBs =
         (await Transaction.sum("montoTotalBs", {
-          where: { ...where, repuesto: category },
+          where: { ...whereForTotals, repuesto: category },
         })) || 0;
       const sumUsd =
         (await Transaction.sum("montoTotalUsd", {
-          where: { ...where, repuesto: category },
+          where: { ...whereForTotals, repuesto: category },
         })) || 0;
       const sumDeuda =
         (await Transaction.sum("deudaTotalUsd", {
-          where: { ...where, repuesto: category },
+          where: { ...whereForTotals, repuesto: category },
         })) || 0;
 
       rubrosCantidad[

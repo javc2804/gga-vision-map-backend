@@ -53,10 +53,17 @@ const getDataGraph = async (req, res) => {
         attributes: [[totalField, "total"]],
       });
 
-      results["total"][category] =
-        data.length && data[0].get("total")
-          ? parseFloat(data[0].get("total").toFixed(2))
-          : 0;
+      const totalCantidad = await Transaction.sum("cantidad", {
+        where: { ...where, repuesto: category },
+      });
+
+      results["total"][category] = {
+        total:
+          data.length && data[0].get("total")
+            ? parseFloat(data[0].get("total").toFixed(2))
+            : 0,
+        cantidad: totalCantidad || 0,
+      };
     }
 
     // Calculate totals for each category considering the axis
@@ -78,10 +85,17 @@ const getDataGraph = async (req, res) => {
           attributes: [[totalField, "total"]],
         });
 
-        results[eje][category] =
-          data.length && data[0].get("total")
-            ? parseFloat(data[0].get("total").toFixed(2))
-            : 0;
+        const totalCantidad = await Transaction.sum("cantidad", {
+          where: { ...where, repuesto: category, eje },
+        });
+
+        results[eje][category] = {
+          total:
+            data.length && data[0].get("total")
+              ? parseFloat(data[0].get("total").toFixed(2))
+              : 0,
+          cantidad: totalCantidad || 0,
+        };
       }
     }
 
