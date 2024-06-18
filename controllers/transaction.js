@@ -42,6 +42,7 @@ const createTransaction = async (req, res) => {
         return {
           ...transactionWithoutId,
           fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
+          formaPago: transaction.formaPago.toLowerCase(), // Convert 'formaPago' to lowercase
           status: true,
         };
       });
@@ -151,6 +152,7 @@ const createTransactionCompromise = async (req, res) => {
           fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
           deudaUnitarioUsd: transaction.precioUnitarioUsd,
           deudaTotalUsd: transaction.montoTotalUsd,
+          formaPago: transaction.formaPago.toLowerCase(), // Convert 'formaPago' to lowercase
           status: true,
         };
       });
