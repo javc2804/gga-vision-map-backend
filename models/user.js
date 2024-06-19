@@ -38,11 +38,16 @@ User.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
   },
   {
     sequelize,
-    modelName: "Users", // Cambia "User" a "Users"
-    tableName: "Users", // Especifica el nombre de la tabla
+    modelName: "Users",
+    tableName: "Users",
   }
 );
 

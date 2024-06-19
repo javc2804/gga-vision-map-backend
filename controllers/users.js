@@ -71,15 +71,39 @@ const resetPassword = async (req, res) => {
 
 const listUsers = async (req, res) => {
   try {
-    const users = await User.findAll();
+    const users = await User.findAll({ where: { deleted: false } });
     res.json(users);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error al obtener los usuarios" });
   }
 };
+const deleteUser = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ msg: "Falta el correo electrónico" });
+  }
+
+  try {
+    let user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(400).json({ msg: "Usuario no encontrado" });
+    }
+
+    user.deleted = true;
+
+    await user.save();
+
+    res.json({ msg: "Usuario eliminado con éxito" });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Error del servidor");
+  }
+};
 export default {
   register,
   resetPassword,
   listUsers,
+  deleteUser,
 };
