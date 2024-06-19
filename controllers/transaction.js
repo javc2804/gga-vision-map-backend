@@ -5,29 +5,21 @@ import xl from "excel4node";
 import Transaction from "../models/transaction.js";
 import fs from "fs";
 import NoteInvoice from "../models/note_invoices.js";
+
 const createTransaction = async (req, res) => {
   const fields = [
-    "user_rel",
-    "cantidad",
-    "descripcion",
-    "descripcionRepuesto",
-    "eje",
     "facNDE",
-    "fechaOcOs",
-    "formaPago",
-    "marcaModelo",
+    "proveedor",
+    "cantidad",
     "montoTotalBs",
     "montoTotalUsd",
     "numeroOrdenPago",
-    "observacion",
-    "ocOs",
     "precioUnitarioBs",
     "precioUnitarioUsd",
-    "proveedor",
-    "repuesto",
-    "subeje",
     "tasaBcv",
-    "ut",
+    "repuesto",
+    "descripcionRepuesto",
+    "fechaOcOs",
   ];
 
   if (
@@ -42,7 +34,7 @@ const createTransaction = async (req, res) => {
         return {
           ...transactionWithoutId,
           fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
-          formaPago: transaction.formaPago.toLowerCase(), // Convert 'formaPago' to lowercase
+          formaPago: "contado", // Convert 'formaPago' to lowercase
           status: true,
         };
       });

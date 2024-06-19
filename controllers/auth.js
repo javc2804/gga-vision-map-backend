@@ -110,6 +110,16 @@ const login = async (req, res) => {
                 },
               ],
             },
+            {
+              name: "Gestión de Proveedores",
+              icon: "Suppliers",
+              route: "/providers",
+            },
+            {
+              name: "Gestión de Repuestos",
+              icon: "AutoParts",
+              route: "/spareparts",
+            },
           ];
         } else if (user.role === "store") {
           menu = [
