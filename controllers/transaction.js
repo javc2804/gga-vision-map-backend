@@ -119,11 +119,11 @@ const createTransactionCompromise = async (req, res) => {
     "nde",
     "fechaOcOs",
     "formaPago",
-    "montoTotalUsd",
+    "deudaTotalUsd",
     "numeroOrdenPago",
     "observacion",
     "ocOs",
-    "precioUnitarioUsd",
+    "deudaUnitarioUsd",
     "proveedor",
     "repuesto",
     "compromiso",
@@ -142,9 +142,7 @@ const createTransactionCompromise = async (req, res) => {
           ...transactionWithoutId,
           facNDE: nde,
           fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
-          deudaUnitarioUsd: transaction.precioUnitarioUsd,
-          deudaTotalUsd: transaction.montoTotalUsd,
-          formaPago: transaction.formaPago.toLowerCase(), // Convert 'formaPago' to lowercase
+          formaPago: "credito",
           status: true,
         };
       });
@@ -172,11 +170,11 @@ const createTransactionUpdateCompromise = async (req, res) => {
     "facNDE",
     "fechaOcOs",
     "formaPago",
-    "montoTotalUsd",
+    // "deudaTotalUsd",
     "numeroOrdenPago",
     "observacion",
     "ocOs",
-    "precioUnitarioUsd",
+    // "deudaUnitarioUsd",
     "proveedor",
     "repuesto",
     "compromiso",
@@ -190,7 +188,7 @@ const createTransactionUpdateCompromise = async (req, res) => {
     )
   ) {
     try {
-      const totalMontoTotalUsd = req.body.reduce(
+      const totalDeudaTotalUsd = req.body.reduce(
         (total, transaction) => total + Number(transaction.montoTotalUsd),
         0
       );
@@ -206,6 +204,7 @@ const createTransactionUpdateCompromise = async (req, res) => {
           ...transactionWithoutId,
           fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
           status: true,
+          formaPago: "contado",
         };
       });
 
@@ -215,14 +214,14 @@ const createTransactionUpdateCompromise = async (req, res) => {
       const transactionToUpdate = await Transaction.findByPk(req.body[0].id);
       if (transactionToUpdate) {
         await transactionToUpdate.update({
-          montoTotalUsd: transactionToUpdate.montoTotalUsd - totalMontoTotalUsd,
+          deudaTotalUsd: transactionToUpdate.deudaTotalUsd - totalDeudaTotalUsd,
           cantidad: transactionToUpdate.cantidad - totalCantidad,
         });
       }
 
       // console.log(totalMontoTotalUsd, totalCantidad);
 
-      res.status(201).json({ transactions, totalMontoTotalUsd, totalCantidad });
+      res.status(201).json({ transactions, totalDeudaTotalUsd, totalCantidad });
     } catch (err) {
       console.log(err);
 
