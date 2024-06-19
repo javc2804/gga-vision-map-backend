@@ -103,7 +103,11 @@ const login = async (req, res) => {
               icon: "People",
               subMenu: [
                 { name: "Registrar usuario", icon: "PersonAdd" },
-                { name: "Listado de usuarios", icon: "PeopleOutline" },
+                {
+                  name: "Gestion de usuarios",
+                  icon: "PeopleOutline",
+                  route: "/users",
+                },
               ],
             },
           ];
