@@ -447,6 +447,7 @@ const getExport = async (req, res) => {
 
     const where = {
       ...cleanedFilters,
+      status: true,
       createdAt: {
         [Op.between]: [new Date(startDate), new Date(endDate)],
       },

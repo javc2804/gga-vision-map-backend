@@ -101,9 +101,34 @@ const deleteUser = async (req, res) => {
     res.status(500).send("Error del servidor");
   }
 };
+
+const toggleUserStatus = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ msg: "Falta el correo electrónico" });
+  }
+
+  try {
+    let user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(400).json({ msg: "Usuario no encontrado" });
+    }
+
+    user.status = !user.status;
+
+    await user.save();
+
+    res.json({ msg: "Estado del usuario actualizado con éxito" });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Error del servidor");
+  }
+};
 export default {
   register,
   resetPassword,
   listUsers,
   deleteUser,
+  toggleUserStatus,
 };
