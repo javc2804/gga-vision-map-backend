@@ -5,6 +5,7 @@ import xl from "excel4node";
 import Transaction from "../models/transaction.js";
 import fs from "fs";
 import NoteInvoice from "../models/note_invoices.js";
+import { format } from "date-fns";
 
 const createTransaction = async (req, res) => {
   const fields = [
@@ -480,10 +481,14 @@ const getExport = async (req, res) => {
           "Deuda Unitaria (USD)": transaction.deudaUnitarioUsd ?? "",
           "Deuda Total (USD)": transaction.deudaTotalUsd ?? "",
           "Tasa BCV": transaction.tasaBcv ?? "",
-          "Fecha de la tasa": transaction.fechaTasa ?? "",
+          "Fecha de la tasa": transaction.fechaTasa
+            ? format(new Date(transaction.fechaTasa), "dd/MM/yyyy")
+            : "",
           "OC/OS": transaction.ocOs ?? "",
           "N° de factura/NDE": transaction.facNDE ?? "",
-          "Fecha OC/OS": transaction.fechaOcOs ?? "",
+          "Fecha OC/OS": transaction.fechaOcOs
+            ? format(new Date(transaction.fechaOcOs), "dd/MM/yyyy")
+            : "",
           "Forma de pago": transaction.formaPago ?? "",
           "N° de orden de pago": transaction.numeroOrdenPago ?? "",
           "N° de Nota de Entrega": transaction.ndeAlmacen ?? "",
@@ -582,20 +587,20 @@ const getExport = async (req, res) => {
       ws.cell(index + 2, 6).string(String(transaction["Registro Proveedor"]));
       ws.cell(index + 2, 7).string(String(transaction["Descripción repuesto"]));
       ws.cell(index + 2, 8).string(String(transaction["Repuesto"]));
-      ws.cell(index + 2, 9).string(String(transaction["Cantidad"]));
-      ws.cell(index + 2, 10).string(
-        String(transaction["Precio unitario (Bs)"])
+      ws.cell(index + 2, 9).number(Number(transaction["Cantidad"]));
+      ws.cell(index + 2, 10).number(
+        Number(transaction["Precio unitario (Bs)"])
       );
-      ws.cell(index + 2, 11).string(String(transaction["Monto total (Bs)"]));
-      ws.cell(index + 2, 12).string(
-        String(transaction["Precio unitario (USD)"])
+      ws.cell(index + 2, 11).number(Number(transaction["Monto total (Bs)"]));
+      ws.cell(index + 2, 12).number(
+        Number(transaction["Precio unitario (USD)"])
       );
-      ws.cell(index + 2, 13).string(String(transaction["Monto total (USD)"]));
-      ws.cell(index + 2, 14).string(
-        String(transaction["Deuda Unitaria (USD)"])
+      ws.cell(index + 2, 13).number(Number(transaction["Monto total (USD)"]));
+      ws.cell(index + 2, 14).number(
+        Number(transaction["Deuda Unitaria (USD)"])
       );
-      ws.cell(index + 2, 15).string(String(transaction["Deuda Total (USD)"]));
-      ws.cell(index + 2, 16).string(String(transaction["Tasa BCV"]));
+      ws.cell(index + 2, 15).number(Number(transaction["Deuda Total (USD)"]));
+      ws.cell(index + 2, 16).number(Number(transaction["Tasa BCV"]));
       ws.cell(index + 2, 17).string(String(transaction["Fecha de la tasa"]));
       ws.cell(index + 2, 18).string(String(transaction["OC/OS"]));
       ws.cell(index + 2, 19).string(String(transaction["N° de factura/NDE"]));
@@ -630,7 +635,6 @@ const getExport = async (req, res) => {
     res.status(500).send({ ok: false, message: error.message });
   }
 };
-``;
 
 const deletePurchase = async (req, res) => {
   try {
