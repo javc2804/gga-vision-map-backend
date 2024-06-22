@@ -85,8 +85,26 @@ const login = async (req, res) => {
               icon: "Money",
               subMenu: [
                 { name: "Lista NDE", icon: "ListAlt", route: "/" },
-                { name: "Registro", icon: "AddBox", route: "/register-out/" },
-                { name: "Listado", icon: "List", route: "/list-purchases" },
+                {
+                  name: "Operatividad",
+                  icon: "AddBox",
+                  route: "/register-out/",
+                },
+                {
+                  name: "Listado de operatividad",
+                  icon: "List",
+                  route: "/list-purchases",
+                },
+                {
+                  name: "Funcionamiento",
+                  icon: "List",
+                  route: "/register-internal",
+                },
+                {
+                  name: "Listado de Funcionamiento",
+                  icon: "List",
+                  route: "/list-internal",
+                },
                 { name: "Gráficos", icon: "BarChart", route: "/graphs-out" },
               ],
             },
