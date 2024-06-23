@@ -3,6 +3,6 @@ import { getProviders } from "../controllers/providersController.js";
 
 const router = express.Router();
 
-router.get("/", getProviders);
+router.get("/list", getProviders);
 
 export default router;
