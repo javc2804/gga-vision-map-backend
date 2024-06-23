@@ -1,5 +1,4 @@
-// import xl from "excel4node";
-import Provider from "../models/provider.js";
+import xl from "excel4node";
 import { format } from "date-fns";
 import SparePartVariant from "../models/SparePartsVariants.js";
 import SparePart from "../models/SpareParts.js";
@@ -21,7 +20,6 @@ export const getSpareParts = async (req, res) => {
       },
     });
 
-    // Mapea los resultados para extraer y enviar solo los valores de 'type'
     const modifiedResults = sparePartVariants.map((variant) => ({
       ...variant.toJSON(),
       type: variant.sparePart.type, // Asegúrate de ajustar esta línea según la estructura real de tus datos
@@ -32,74 +30,87 @@ export const getSpareParts = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-// export const exportSparePartsToExcel = async (req, res) => {
-//   try {
-//     const providers = await Provider.findAll({ raw: true });
 
-//     const wb = new xl.Workbook();
-//     const ws = wb.addWorksheet("Providers");
+export const exportSparePartsToExcel = async (req, res) => {
+  try {
+    const sparePartVariants = await SparePartVariant.findAll({
+      include: [
+        {
+          model: SparePart,
+          as: "sparePart",
+          attributes: ["type"], // Asegurarse de que 'type' es el campo correcto
+        },
+      ],
+      raw: true,
+      nest: true,
+    });
 
-//     const headerStyle = wb.createStyle({
-//       font: {
-//         color: "#FFFFFF",
-//         bold: true,
-//       },
-//       fill: {
-//         type: "pattern",
-//         patternType: "solid",
-//         fgColor: "1F4E78",
-//       },
-//       alignment: {
-//         horizontal: "center",
-//         vertical: "center",
-//       },
-//     });
+    const wb = new xl.Workbook();
+    const ws = wb.addWorksheet("Spare Parts Variants");
 
-//     const headers = ["Fecha creado", "Nombre", "Creador por"];
-//     const columnWidths = new Array(headers.length).fill(0);
+    const headerStyle = wb.createStyle({
+      font: {
+        color: "#FFFFFF",
+        bold: true,
+      },
+      fill: {
+        type: "pattern",
+        patternType: "solid",
+        fgColor: "#1F4E78",
+      },
+      alignment: {
+        horizontal: "center",
+        vertical: "center",
+      },
+    });
 
-//     // Añadir cabeceras
-//     headers.forEach((header, i) => {
-//       ws.cell(1, i + 1)
-//         .string(header)
-//         .style(headerStyle);
-//       columnWidths[i] = Math.max(columnWidths[i], header.length);
-//     });
+    const headers = [
+      "ID",
+      "Fecha Creación",
+      "Repuesto",
+      "Descripción de Repuesto",
+      "Creado Por",
+      "Estado",
+    ];
+    headers.forEach((header, i) => {
+      ws.cell(1, i + 1)
+        .string(header)
+        .style(headerStyle);
+    });
 
-//     // Añadir datos
-//     providers.forEach((provider, index) => {
-//       const row = index + 2;
-//       const formattedDate = format(new Date(provider.createdAt), "dd/MM/yyyy");
-//       ws.cell(row, 1).string(formattedDate);
-//       ws.cell(row, 2).string(provider.name);
-//       ws.cell(row, 3).string(provider.user_rel);
+    sparePartVariants.forEach((variant, index) => {
+      const row = index + 2;
+      ws.cell(row, 1).number(variant.id);
+      ws.cell(row, 2).string(format(new Date(variant.createdAt), "dd/MM/yyyy"));
+      ws.cell(row, 3).string(variant.sparePart.type || ""); // Usa 'type' para 'Descripción de Repuesto'
+      ws.cell(row, 4).string(variant.variant || ""); // Usa el valor actual para 'Repuesto'
+      ws.cell(row, 5).string(variant.userid || "");
+      ws.cell(row, 6).string(variant.status || "");
+    });
 
-//       // Actualizar el ancho máximo de la columna si es necesario
-//       columnWidths[0] = Math.max(columnWidths[0], formattedDate.length);
-//       columnWidths[1] = Math.max(columnWidths[1], provider.name.length);
-//       columnWidths[2] = Math.max(columnWidths[2], provider.user_rel.length);
-//     });
+    ws.column(1).setWidth(10);
+    ws.column(2).setWidth(20);
+    ws.column(3).setWidth(15);
+    ws.column(4).setWidth(30);
+    ws.column(5).setWidth(15);
+    ws.column(6).setWidth(10);
 
-//     // Ajustar el ancho de las columnas
-//     columnWidths.forEach((width, i) => {
-//       ws.column(i + 1).setWidth(width + 2); // +2 para un poco de margen
-//     });
-
-//     // Escribir el archivo en el servidor y enviarlo
-//     const filePath = "./providers.xlsx";
-//     wb.write(filePath, (err, stats) => {
-//       if (err) {
-//         console.error(err);
-//         res.status(500).json({ error: err.message });
-//       } else {
-//         res.download(filePath, (err) => {
-//           if (err) throw err;
-//           // Opcional: eliminar el archivo después de enviarlo
-//           // fs.unlinkSync(filePath);
-//         });
-//       }
-//     });
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
+    const filePath = "./sparePartsVariants.xlsx";
+    wb.write(filePath, (err, stats) => {
+      if (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+      } else {
+        res.download(filePath, (err) => {
+          if (err) {
+            console.error(err);
+            res.status(500).send("Error al descargar el archivo");
+          }
+        });
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
