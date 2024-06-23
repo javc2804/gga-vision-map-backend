@@ -1,42 +1,57 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database.js";
-import User from "./user.js";
+import SparePart from "./SpareParts.js";
 
 class SparePartVariant extends Model {}
 
 SparePartVariant.init(
   {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     variant: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     status: {
-      type: DataTypes.BOOLEAN,
+      type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: true,
     },
     sparepartid: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: "SpareParts", // nombre de la tabla a la que hace referencia
-        key: "id", // campo en la tabla SpareParts que sparepartid hace referencia
-      },
     },
     userid: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: User,
-        key: "id",
-      },
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
   },
   {
     sequelize,
-    tableName: "SparePartVariants", // Asegúrate de que este es el nombre exacto de tu tabla en la base de datos
     modelName: "SparePartVariant",
   }
 );
+
+// Definir la relación
+SparePart.hasMany(SparePartVariant, {
+  foreignKey: "sparepartid",
+  as: "variants",
+});
+SparePartVariant.belongsTo(SparePart, {
+  foreignKey: "sparepartid",
+  as: "sparePart",
+});
 
 export default SparePartVariant;

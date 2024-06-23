@@ -13,6 +13,7 @@ import graphOutRoutes from "./routes/graphsOutRoutes.js";
 import UsersRoutes from "./routes/usersRoute.js";
 import outInternalRoutes from "./routes/outInternalRoutes.js";
 import noteInvoicesRoutes from "./routes/noteInvoices.js";
+import sparePartsRoutes from "./routes/sparePartsRoutes.js";
 import NoteInvoice from "./models/note_invoices.js";
 import path from "path";
 
@@ -36,6 +37,7 @@ app.use("/download-template", downloadTemplateRoutes);
 app.use("/graphs-out", graphOutRoutes);
 app.use("/users", UsersRoutes);
 app.use("/out-internal", outInternalRoutes);
+app.use("/spare-parts", sparePartsRoutes);
 
 sequelize
   // .sync({ force: true })
