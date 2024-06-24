@@ -103,7 +103,6 @@ const login = async (req, res) => {
                 {
                   name: "Listado de Funcionamiento",
                   icon: "List",
-                  route: "/list-internal",
                 },
                 { name: "Gráficos", icon: "BarChart", route: "/graphs-out" },
               ],
@@ -112,7 +111,17 @@ const login = async (req, res) => {
               name: "Almacen",
               icon: "Store",
               subMenu: [
-                { name: "Notas de entrega", icon: "Note" },
+                {
+                  name: "Notas de entrega",
+                  icon: "Note",
+                  route: "/note-invoices",
+                },
+
+                {
+                  name: "Listar Notas",
+                  icon: "Inventory",
+                  route: "/note-invoices-list",
+                },
                 { name: "Inventario", icon: "Inventory" },
               ],
             },
