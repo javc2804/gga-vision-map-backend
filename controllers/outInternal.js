@@ -2,7 +2,21 @@ import OutInternal from "../models/outInternal.js"; // Asegúrate de que la ruta
 
 const register = async (req, res) => {
   try {
-    const newOutInternal = await OutInternal.create(req.body.data);
+    // Clonar el objeto data para no modificar el original
+    let data = { ...req.body.data };
+
+    if (data.fecha_tasa) {
+      data.fecha_tasa = new Date(data.fecha_tasa + "T00:00:00");
+    }
+    if (data.fecha_factura) {
+      data.fecha_factura = new Date(data.fecha_factura + "T00:00:00");
+    }
+
+    if (data.fecha_pago) {
+      data.fecha_pago = new Date(data.fecha_pago + "T00:00:00");
+    }
+
+    const newOutInternal = await OutInternal.create(data);
 
     res.status(201).json({
       message: "Registro creado con éxito",
