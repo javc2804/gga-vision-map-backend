@@ -103,6 +103,7 @@ const login = async (req, res) => {
                 {
                   name: "Listado de Funcionamiento",
                   icon: "List",
+                  route: "/list-internal",
                 },
                 { name: "Gráficos", icon: "BarChart", route: "/graphs-out" },
               ],
