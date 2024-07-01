@@ -1,4 +1,3 @@
-// Importa el modelo
 import Fleet from "../models/fleet.js";
 
 import Sequelize from "sequelize";
@@ -8,6 +7,7 @@ import NoteInvoice from "../models/note_invoices.js";
 import pdfMake from "pdfmake/build/pdfmake.js";
 import pdfFonts from "pdfmake/build/vfs_fonts.js";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
 export const createNoteInvoice = async (req, res) => {
   try {
     const noteInvoice = await NoteInvoice.create(req.body);
