@@ -1,4 +1,5 @@
 import Fleet from "../models/fleet.js";
+import Transaction from "../models/transaction.js";
 
 import Sequelize from "sequelize";
 
@@ -12,6 +13,24 @@ export const createNoteInvoice = async (req, res) => {
   try {
     const noteInvoice = await NoteInvoice.create(req.body);
     res.status(201).json(noteInvoice);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getTransactions = async (req, res) => {
+  try {
+    const specificDate = new Date("2024-06-30T23:59:59");
+
+    const transactions = await Transaction.findAll({
+      where: {
+        createdAt: {
+          [Sequelize.Op.gt]: specificDate, // Buscar transacciones después de esta fecha
+        },
+      },
+    });
+
+    res.json(transactions);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
