@@ -112,11 +112,11 @@ const login = async (req, res) => {
               name: "Almacen",
               icon: "Store",
               subMenu: [
-                {
-                  name: "Notas de entrega",
-                  icon: "Note",
-                  route: "/note-invoices",
-                },
+                // {
+                //   name: "Notas de entrega",
+                //   icon: "Note",
+                //   route: "/note-invoices",
+                // },
 
                 {
                   name: "Listar Notas",

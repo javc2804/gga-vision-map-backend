@@ -7,7 +7,7 @@ import Provider from "../models/provider.js"; // Import the Provider model
 const getCombinedData = async (req, res) => {
   try {
     const fleets = await Fleet.findAll({
-      attributes: ["ut", "marcaModelo"],
+      attributes: ["ut", "marcaModelo", "eje", "subeje"],
     });
     const eje = (
       await Fleet.findAll({
