@@ -163,8 +163,32 @@ const createTransactionCompromise = async (req, res) => {
     )
   ) {
     try {
+      // Actualizar el inventario para cada transacción
+      for (const transaction of req.body) {
+        const inventoryItem = await Inventory.findOne({
+          where: { descripcion: transaction.descripcionRepuesto },
+        });
+
+        if (!inventoryItem) {
+          // Si no existe, insertar en Inventories
+          inventoryItem = await Inventory.create({
+            descripcion: descripcionRepuesto,
+            entrada: cantidad,
+            cantidad: cantidad, // Asumiendo que 'cantidad' debe mapearse a 'entrada' y 'cantidad'
+          });
+        } else {
+          const nuevaEntrada = inventoryItem.entrada + cantidad;
+          const nuevaCantidad = inventoryItem.cantidad + cantidad;
+          await inventoryItem.update({
+            entrada: nuevaEntrada,
+            cantidad: nuevaCantidad,
+          });
+        }
+      }
+
+      // Preparar datos de las transacciones, excluyendo 'id' y ajustando otros campos
       const transactionsData = req.body.map((transaction) => {
-        const { id, nde, ...transactionWithoutId } = transaction; // Remove 'id' from each transaction
+        const { id, nde, ...transactionWithoutId } = transaction;
         return {
           ...transactionWithoutId,
           facNDE: nde,
@@ -174,12 +198,12 @@ const createTransactionCompromise = async (req, res) => {
         };
       });
 
+      // Crear las transacciones en la base de datos
       const transactions = await Transaction.bulkCreate(transactionsData);
 
       res.status(201).json(transactions);
     } catch (err) {
       console.log(err);
-
       res.status(500).json({ error: err.message });
     }
   } else {

@@ -15,6 +15,7 @@ export const createNoteInvoice = async (req, res) => {
     const dataWithoutIds = req.body.data.map(({ id, ...rest }) => {
       // Convertir quantity a entero
       rest.quantity = parseInt(rest.quantity, 10);
+      rest.status = false;
       return rest;
     });
 
