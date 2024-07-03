@@ -86,46 +86,29 @@ const login = async (req, res) => {
               subMenu: [
                 { name: "Lista NDE", icon: "ListAlt", route: "/" },
                 {
-                  name: "Operatividad",
+                  name: "Mantenimiento",
                   icon: "AddBox",
                   route: "/register-out/",
                 },
                 {
-                  name: "Listado de operatividad",
+                  name: "Listado de mantenimiento",
                   icon: "List",
                   route: "/list-purchases",
                 },
                 {
-                  name: "Funcionamiento",
+                  name: "Gastos administrativos",
                   icon: "List",
                   route: "/register-internal",
                 },
                 {
-                  name: "Listado de Funcionamiento",
+                  name: "Listado de gastos administrativos",
                   icon: "List",
                   route: "/list-internal",
                 },
                 { name: "Gráficos", icon: "BarChart", route: "/graphs-out" },
               ],
             },
-            {
-              name: "Almacen",
-              icon: "Store",
-              subMenu: [
-                // {
-                //   name: "Notas de entrega",
-                //   icon: "Note",
-                //   route: "/note-invoices",
-                // },
 
-                {
-                  name: "Listar Notas",
-                  icon: "Inventory",
-                  route: "/note-invoices-list",
-                },
-                { name: "Inventario", icon: "Inventory" },
-              ],
-            },
             {
               name: "Usuarios",
               icon: "People",
@@ -155,8 +138,12 @@ const login = async (req, res) => {
               name: "Almacen",
               icon: "Store",
               subMenu: [
-                { name: "Notas de entrega", icon: "Note" },
-                { name: "Inventario", icon: "Inventory" },
+                {
+                  name: "Listar Notas",
+                  icon: "Inventory",
+                  route: "/note-invoices-list",
+                },
+                { name: "Inventario", icon: "Inventory", route: "/inventory" },
               ],
             },
           ];

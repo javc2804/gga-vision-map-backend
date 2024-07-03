@@ -10,8 +10,6 @@ import pdfFonts from "pdfmake/build/vfs_fonts.js";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export const createNoteInvoice = async (req, res) => {
-  console.log(req.body.data);
-
   try {
     const dataWithoutIds = req.body.data.map(({ id, ...rest }) => rest);
 

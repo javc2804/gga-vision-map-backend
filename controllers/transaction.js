@@ -6,6 +6,7 @@ import Transaction from "../models/transaction.js";
 import fs from "fs";
 import NoteInvoice from "../models/note_invoices.js";
 import { format } from "date-fns";
+import Inventory from "../models/inventory.js";
 
 const createTransaction = async (req, res) => {
   const fields = [
@@ -30,15 +31,40 @@ const createTransaction = async (req, res) => {
     )
   ) {
     try {
-      const transactionsData = req.body.map((transaction) => {
-        const { id, ...transactionWithoutId } = transaction;
-        return {
-          ...transactionWithoutId,
-          fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
-          formaPago: "contado", // Convert 'formaPago' to lowercase
-          status: true,
-        };
-      });
+      const transactionsData = await Promise.all(
+        req.body.map(async (transaction) => {
+          const { id, descripcionRepuesto, cantidad, ...transactionWithoutId } =
+            transaction;
+
+          // Verificar si existe en Inventories
+          let inventoryItem = await Inventory.findOne({
+            where: { descripcion: descripcionRepuesto },
+          });
+
+          if (!inventoryItem) {
+            // Si no existe, insertar en Inventories
+            inventoryItem = await Inventory.create({
+              descripcion: descripcionRepuesto,
+              entrada: cantidad,
+              cantidad: cantidad, // Asumiendo que 'cantidad' debe mapearse a 'entrada' y 'cantidad'
+            });
+          } else {
+            const nuevaEntrada = inventoryItem.entrada + cantidad;
+            const nuevaCantidad = inventoryItem.cantidad + cantidad;
+            await inventoryItem.update({
+              entrada: nuevaEntrada,
+              cantidad: nuevaCantidad,
+            });
+          }
+
+          return {
+            ...transactionWithoutId,
+            fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
+            formaPago: "contado",
+            status: true,
+          };
+        })
+      );
 
       const transactions = await Transaction.bulkCreate(transactionsData);
 
