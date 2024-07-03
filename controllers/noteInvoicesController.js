@@ -7,15 +7,37 @@ import NoteInvoice from "../models/note_invoices.js";
 // Importa pdfmake
 import pdfMake from "pdfmake/build/pdfmake.js";
 import pdfFonts from "pdfmake/build/vfs_fonts.js";
+import Inventory from "../models/inventory.js";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export const createNoteInvoice = async (req, res) => {
   try {
-    const dataWithoutIds = req.body.data.map(({ id, ...rest }) => rest);
+    const dataWithoutIds = req.body.data.map(({ id, ...rest }) => {
+      // Convertir quantity a entero
+      rest.quantity = parseInt(rest.quantity, 10);
+      return rest;
+    });
+
+    for (const item of dataWithoutIds) {
+      const inventoryItem = await Inventory.findOne({
+        where: { descripcion: item.spare_part_variant },
+      });
+      if (inventoryItem) {
+        await inventoryItem.update({
+          cantidad: inventoryItem.cantidad - item.quantity, // Usar item.quantity aquí
+          salida: (inventoryItem.salida || 0) + item.quantity, // Y también aquí
+        });
+      } else {
+        console.log(
+          `Ítem no encontrado en el inventario: ${item.spare_part_variant}` // Ajustar el mensaje de error para reflejar el cambio a spare_part_variant
+        );
+      }
+    }
 
     const noteInvoices = await NoteInvoice.bulkCreate(dataWithoutIds);
     res.status(201).json(noteInvoices);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: error.message });
   }
 };
