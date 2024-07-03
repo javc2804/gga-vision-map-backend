@@ -12,9 +12,9 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export const createNoteInvoice = async (req, res) => {
   try {
-    const dataWithoutIds = req.body.data.map(({ id, ...rest }) => {
+    const dataWithoutIds = req.body.data.map(({ id_items, id, ...rest }) => {
       rest.quantity = parseInt(rest.quantity, 10);
-      return rest;
+      return { id, ...rest }; // Asegúrate de incluir el id en el objeto retornado
     });
 
     for (const item of dataWithoutIds) {
@@ -23,14 +23,26 @@ export const createNoteInvoice = async (req, res) => {
       });
       if (inventoryItem) {
         await inventoryItem.update({
-          cantidad: inventoryItem.cantidad - item.quantity, // Usar item.quantity aquí
-          salida: (inventoryItem.salida || 0) + item.quantity, // Y también aquí
-          status: false,
+          cantidad: inventoryItem.cantidad - item.quantity,
+          salida: (inventoryItem.salida || 0) + item.quantity,
         });
       } else {
         console.log(
-          `Ítem no encontrado en el inventario: ${item.spare_part_variant}` // Ajustar el mensaje de error para reflejar el cambio a spare_part_variant
+          `Ítem no encontrado en el inventario: ${item.spare_part_variant}`
         );
+      }
+
+      // Aquí se busca y actualiza el estado en la tabla transactions
+      if (item.id) {
+        // Asegúrate de que el id existe
+        const transaction = await Transaction.findOne({
+          where: { id: item.id },
+        });
+        if (transaction) {
+          await transaction.update({ status: true }); // Actualiza el estado a true
+        } else {
+          console.log(`Transacción no encontrada con el id: ${item.id}`);
+        }
       }
     }
 

@@ -117,6 +117,11 @@ const Transaction = db.define("transactions", {
     type: Sequelize.BOOLEAN,
     allowNull: false,
   },
+  deleted: {
+    type: Sequelize.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
   user_rel: {
     type: Sequelize.STRING,
     allowNull: false,

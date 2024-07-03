@@ -61,7 +61,7 @@ const createTransaction = async (req, res) => {
             descripcionRepuesto,
             fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
             formaPago: "contado",
-            status: true,
+            status: false,
           };
         })
       );
@@ -400,7 +400,7 @@ const getListTransaction = async (req, res) => {
         [Op.between]: [startDate, endDate],
       },
       ...(deudaTotalUsd && { deudaTotalUsd }),
-      status: true,
+      deleted: false,
     };
 
     const transactions = await Transaction.findAndCountAll({
@@ -692,7 +692,7 @@ const deletePurchase = async (req, res) => {
 
     // Recorre el array de IDs y actualiza cada transacción
     for (const id of ids) {
-      await Transaction.update({ status: false }, { where: { id: id } });
+      await Transaction.update({ deleted: true }, { where: { id: id } });
     }
 
     res.status(200).json({ message: "Transactions updated successfully" });
