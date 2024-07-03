@@ -36,17 +36,15 @@ const createTransaction = async (req, res) => {
           const { id, descripcionRepuesto, cantidad, ...transactionWithoutId } =
             transaction;
 
-          // Verificar si existe en Inventories
           let inventoryItem = await Inventory.findOne({
             where: { descripcion: descripcionRepuesto },
           });
 
           if (!inventoryItem) {
-            // Si no existe, insertar en Inventories
             inventoryItem = await Inventory.create({
               descripcion: descripcionRepuesto,
               entrada: cantidad,
-              cantidad: cantidad, // Asumiendo que 'cantidad' debe mapearse a 'entrada' y 'cantidad'
+              cantidad: cantidad,
             });
           } else {
             const nuevaEntrada = inventoryItem.entrada + cantidad;
@@ -59,6 +57,8 @@ const createTransaction = async (req, res) => {
 
           return {
             ...transactionWithoutId,
+            cantidad,
+            descripcionRepuesto,
             fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
             formaPago: "contado",
             status: true,
@@ -163,30 +163,26 @@ const createTransactionCompromise = async (req, res) => {
     )
   ) {
     try {
-      // Actualizar el inventario para cada transacción
       for (const transaction of req.body) {
-        const inventoryItem = await Inventory.findOne({
+        let inventoryItem = await Inventory.findOne({
           where: { descripcion: transaction.descripcionRepuesto },
         });
 
         if (!inventoryItem) {
-          // Si no existe, insertar en Inventories
           inventoryItem = await Inventory.create({
-            descripcion: descripcionRepuesto,
-            entrada: cantidad,
-            cantidad: cantidad, // Asumiendo que 'cantidad' debe mapearse a 'entrada' y 'cantidad'
+            descripcion: transaction.descripcionRepuesto,
+            entrada: transaction.cantidad,
+            cantidad: transaction.cantidad, // Asumiendo que 'cantidad' debe mapearse a 'entrada' y 'cantidad'
           });
         } else {
-          const nuevaEntrada = inventoryItem.entrada + cantidad;
-          const nuevaCantidad = inventoryItem.cantidad + cantidad;
+          const nuevaEntrada = inventoryItem.entrada + transaction.cantidad;
+          const nuevaCantidad = inventoryItem.cantidad + transaction.cantidad;
           await inventoryItem.update({
             entrada: nuevaEntrada,
             cantidad: nuevaCantidad,
           });
         }
       }
-
-      // Preparar datos de las transacciones, excluyendo 'id' y ajustando otros campos
       const transactionsData = req.body.map((transaction) => {
         const { id, nde, ...transactionWithoutId } = transaction;
         return {

@@ -13,9 +13,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 export const createNoteInvoice = async (req, res) => {
   try {
     const dataWithoutIds = req.body.data.map(({ id, ...rest }) => {
-      // Convertir quantity a entero
       rest.quantity = parseInt(rest.quantity, 10);
-      rest.status = false;
       return rest;
     });
 
@@ -27,6 +25,7 @@ export const createNoteInvoice = async (req, res) => {
         await inventoryItem.update({
           cantidad: inventoryItem.cantidad - item.quantity, // Usar item.quantity aquí
           salida: (inventoryItem.salida || 0) + item.quantity, // Y también aquí
+          status: false,
         });
       } else {
         console.log(
