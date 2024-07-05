@@ -11,6 +11,9 @@ import Inventory from "../models/inventory.js";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export const createNoteInvoice = async (req, res) => {
+  // console.log(req.body.data);
+  // return;
+
   try {
     const dataWithoutIds = req.body.data.map(({ id_items, id, ...rest }) => {
       rest.quantity = parseInt(rest.quantity, 10);
@@ -56,7 +59,7 @@ export const createNoteInvoice = async (req, res) => {
 
 export const getTransactions = async (req, res) => {
   try {
-    const specificDate = new Date("2024-06-30T23:59:59");
+    const specificDate = new Date("2024-07-03T23:59:59");
 
     const transactions = await Transaction.findAll({
       where: {
