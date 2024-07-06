@@ -11,13 +11,13 @@ import Inventory from "../models/inventory.js";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export const createNoteInvoice = async (req, res) => {
-  // console.log(req.body.data);
-  // return;
-
   try {
+    // Asumiendo que todos los objetos en el array tienen el mismo id, extraemos el id del primer elemento.
+    const commonId = req.body.data[0]?.id;
+
     const dataWithoutIds = req.body.data.map(({ id_items, id, ...rest }) => {
       rest.quantity = parseInt(rest.quantity, 10);
-      return { id, ...rest }; // Asegúrate de incluir el id en el objeto retornado
+      return { ...rest }; // Excluimos el id aquí para asegurarnos de que no se inserte
     });
 
     for (const item of dataWithoutIds) {
@@ -34,18 +34,17 @@ export const createNoteInvoice = async (req, res) => {
           `Ítem no encontrado en el inventario: ${item.spare_part_variant}`
         );
       }
+    }
 
-      // Aquí se busca y actualiza el estado en la tabla transactions
-      if (item.id) {
-        // Asegúrate de que el id existe
-        const transaction = await Transaction.findOne({
-          where: { id: item.id },
-        });
-        if (transaction) {
-          await transaction.update({ status: true }); // Actualiza el estado a true
-        } else {
-          console.log(`Transacción no encontrada con el id: ${item.id}`);
-        }
+    // Actualización de la tabla transactions usando el commonId
+    if (commonId) {
+      const transaction = await Transaction.findOne({
+        where: { id: commonId },
+      });
+      if (transaction) {
+        await transaction.update({ status: true });
+      } else {
+        console.log(`Transacción no encontrada con el id: ${commonId}`);
       }
     }
 
