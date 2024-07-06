@@ -190,7 +190,7 @@ const createTransactionCompromise = async (req, res) => {
           facNDE: nde,
           fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
           formaPago: "credito",
-          status: true,
+          status: false,
         };
       });
 
