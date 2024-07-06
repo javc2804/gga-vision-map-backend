@@ -110,16 +110,9 @@ const login = async (req, res) => {
             },
 
             {
-              name: "Usuarios",
-              icon: "People",
-              subMenu: [
-                { name: "Registrar usuario", icon: "PersonAdd" },
-                {
-                  name: "Gestion de usuarios",
-                  icon: "PeopleOutline",
-                  route: "/users",
-                },
-              ],
+              name: "Gestion de usuarios",
+              icon: "PeopleOutline",
+              route: "/users",
             },
             {
               name: "Gestión de Proveedores",
@@ -135,8 +128,8 @@ const login = async (req, res) => {
         } else if (user.role === "store") {
           menu = [
             {
-              name: "Almacen",
-              icon: "Store",
+              name: "Almacén",
+              icon: "HomeWorkIcon",
               subMenu: [
                 {
                   name: "Listar Notas",
