@@ -17,6 +17,7 @@ export const createNoteInvoice = async (req, res) => {
 
     const dataWithoutIds = req.body.data.map(({ id_items, id, ...rest }) => {
       rest.quantity = parseInt(rest.quantity, 10);
+      rest.note_number = commonId;
       return { ...rest }; // Excluimos el id aquí para asegurarnos de que no se inserte
     });
 

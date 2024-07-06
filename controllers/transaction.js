@@ -308,7 +308,7 @@ const getTransaction = async (req, res) => {
   try {
     const transaction = await Transaction.findOne({
       where: {
-        facNDE: req.body.id,
+        id: req.body.id,
       },
     });
     res.json(transaction);
