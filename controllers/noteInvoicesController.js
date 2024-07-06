@@ -5,26 +5,43 @@ import Sequelize from "sequelize";
 
 import NoteInvoice from "../models/note_invoices.js";
 // Importa pdfmake
-import pdfMake from "pdfmake/build/pdfmake.js";
-import pdfFonts from "pdfmake/build/vfs_fonts.js";
+// import pdfMake from "pdfmake/build/pdfmake.js";
+// import pdfFonts from "pdfmake/build/vfs_fonts.js";
 import Inventory from "../models/inventory.js";
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+// pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
+import PDFDocument from "pdfkit";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const createNoteInvoice = async (req, res) => {
   try {
-    // Asumiendo que todos los objetos en el array tienen el mismo id, extraemos el id del primer elemento.
     const commonId = req.body.data[0]?.id;
 
     const dataWithoutIds = req.body.data.map(({ id_items, id, ...rest }) => {
       rest.quantity = parseInt(rest.quantity, 10);
       rest.note_number = commonId;
-      return { ...rest }; // Excluimos el id aquí para asegurarnos de que no se inserte
+      return { ...rest };
     });
 
     for (const item of dataWithoutIds) {
+      if (!item.spare_part_variant) {
+        console.log(
+          `Ítem omitido debido a falta de 'spare_part_variant': ${JSON.stringify(
+            item
+          )}`
+        );
+        continue; // Salta este ítem si 'spare_part_variant' es undefined
+      }
+
       const inventoryItem = await Inventory.findOne({
         where: { descripcion: item.spare_part_variant },
       });
+
       if (inventoryItem) {
         await inventoryItem.update({
           cantidad: inventoryItem.cantidad - item.quantity,
@@ -37,11 +54,11 @@ export const createNoteInvoice = async (req, res) => {
       }
     }
 
-    // Actualización de la tabla transactions usando el commonId
     if (commonId) {
       const transaction = await Transaction.findOne({
         where: { id: commonId },
       });
+
       if (transaction) {
         await transaction.update({ status: true });
       } else {
@@ -65,6 +82,12 @@ export const getTransactions = async (req, res) => {
       where: {
         createdAt: {
           [Sequelize.Op.gt]: specificDate, // Buscar transacciones después de esta fecha
+        },
+        ut: {
+          [Sequelize.Op.or]: [
+            { [Sequelize.Op.is]: null }, // 'ut' es null
+            { [Sequelize.Op.eq]: "" }, // 'ut' es una cadena vacía
+          ],
         },
       },
     });
@@ -141,93 +164,58 @@ export const getNoteInvoices = async (req, res) => {
 };
 
 export const getNoteInvoicePDF = async (req, res) => {
-  try {
-    // Datos aleatorios para la primera tabla
-    const table1 = [
-      ["Key 1", "Value 1"],
-      ["Key 2", "Value 2"],
-      ["Key 3", "Value 3"],
-    ];
+  const doc = new PDFDocument();
+  doc.pipe(fs.createWriteStream("output.pdf"));
 
-    // Datos aleatorios para la segunda tabla
-    const table2 = [
-      ["UT1", "Status1", "Attention1", "Eje1", "Subeje1", "MarcaModelo1"],
-      ["UT2", "Status2", "Attention2", "Eje2", "Subeje2", "MarcaModelo2"],
-      ["UT3", "Status3", "Attention3", "Eje3", "Subeje3", "MarcaModelo3"],
-    ];
+  const imagePath = path.join(__dirname, "..", "public", "logo.png");
+  doc.image(imagePath, 50, 50, { width: 100 });
 
-    // Define el documento
-    const docDefinition = {
-      content: [
-        {
-          text: "Primera tabla",
-          style: "header",
-        },
-        {
-          table: {
-            body: [["Key", "Value"], ...table1],
-          },
-        },
-        {
-          text: "Segunda tabla",
-          style: "header",
-        },
-        {
-          table: {
-            body: [
-              ["UT", "Status", "Attention", "Eje", "Subeje", "MarcaModelo"],
-              ...table2,
-            ],
-          },
-        },
-      ],
-      styles: {
-        header: {
-          fontSize: 18,
-          bold: true,
-          margin: [0, 0, 0, 10],
-        },
-        table: {
-          // Estilos de la tabla
-        },
-      },
-    };
+  // Título
+  doc.fontSize(12).text("Asignaciones:", 50, 150);
 
-    // Genera el PDF
-    const pdfDoc = pdfMake.createPdf(docDefinition);
-    console.log("PDF document created");
+  // Cabeceras de la tabla
+  const headers = [
+    "UT",
+    "Modelo",
+    "Eje",
+    "SUB-EJE",
+    "DESCRIPCION",
+    "CANTIDAD",
+    "CODIGO DE LOS CAUCHOS",
+  ];
+  const startY = 170;
+  let currentY = startY;
 
-    // Convierte el PDF a un Buffer para poder obtener su tamaño
-    const pdfBuffer = await new Promise((resolve, reject) => {
-      const chunks = [];
+  // Dibujar cabeceras
+  headers.forEach((header, index) => {
+    doc.text(header, 50 + index * 100, currentY);
+  });
 
-      pdfDoc
-        .getStream()
-        .on("data", (chunk) => {
-          console.log("Data chunk received");
-          chunks.push(chunk);
-        })
-        .on("end", () => {
-          console.log("Stream ended");
-          resolve(Buffer.concat(chunks));
-        })
-        .on("error", (error) => {
-          console.log("Stream error:", error);
-          reject(error);
-        });
-    });
+  currentY += 20; // Espacio para la siguiente fila
 
-    console.log("PDF converted to buffer");
+  // Dibujar filas de la tabla
+  req.body.invoices.forEach((invoice, index) => {
+    let offsetX = 0;
+    doc.text(invoice.id, 50 + offsetX, currentY);
+    offsetX += 100; // Ajustar según el ancho de la columna
+    doc.text(invoice.ut, 50 + offsetX, currentY);
+    offsetX += 100;
+    doc.text(invoice.marcaModelo, 50 + offsetX, currentY);
+    offsetX += 100;
+    doc.text(invoice.eje, 50 + offsetX, currentY);
+    offsetX += 100;
+    doc.text(invoice.subeje, 50 + offsetX, currentY);
+    offsetX += 100;
+    doc.text(invoice.descripcion, 50 + offsetX, currentY);
+    offsetX += 100;
+    doc.text(invoice.cantidad, 50 + offsetX, currentY);
+    offsetX += 100;
+    doc.text(invoice.observation, 50 + offsetX, currentY);
+    currentY += 20; // Espacio para la siguiente fila
+  });
 
-    // Establece las cabeceras de la respuesta
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", "attachment; filename=invoice.pdf");
-    res.setHeader("Content-Length", pdfBuffer.length);
+  doc.end();
 
-    // Envía el PDF como respuesta
-    res.end(pdfBuffer);
-  } catch (error) {
-    console.error(error); // Imprime el error en la consola
-    res.status(500).json({ error: error.message });
-  }
+  res.setHeader("Content-Type", "application/pdf");
+  doc.pipe(res);
 };
