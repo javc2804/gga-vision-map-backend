@@ -125,8 +125,38 @@ const toggleUserStatus = async (req, res) => {
     res.status(500).send("Error del servidor");
   }
 };
+
+const editUser = async (req, res) => {
+  const { name, lastName, role, email, password } = req.body;
+
+  if (!name || !lastName || !role || !email || !password) {
+    return res.status(400).json({ msg: "Faltan campos requeridos" });
+  }
+
+  try {
+    let user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(400).json({ msg: "Usuario no encontrado" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+    user.name = name;
+    user.lastName = lastName;
+    user.role = role;
+
+    await user.save();
+
+    res.json({ msg: "Usuario actualizado con éxito" });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Error del servidor");
+  }
+};
+
 export default {
   register,
+  editUser,
   resetPassword,
   listUsers,
   deleteUser,
