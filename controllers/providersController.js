@@ -4,7 +4,9 @@ import { format } from "date-fns";
 
 export const getProviders = async (req, res) => {
   try {
-    const providers = await Provider.findAll();
+    const providers = await Provider.findAll({
+      order: [["createdAt", "DESC"]], // Ordena por createdAt de forma descendente
+    });
     res.status(200).json(providers);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -77,6 +79,27 @@ export const exportProvidersToExcel = async (req, res) => {
         });
       }
     });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const createProvider = async (req, res) => {
+  try {
+    const { name, user_rel } = req.body.data;
+
+    if (!name) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    const newProvider = await Provider.create({
+      name,
+      user_rel,
+      status: true,
+      createdAt: new Date(),
+    });
+
+    res.status(201).json(newProvider);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
