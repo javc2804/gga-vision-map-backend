@@ -81,19 +81,25 @@ const createTransaction = async (req, res) => {
   }
 };
 const createTransactionAsing = async (req, res) => {
-  const totalQuantity = req.body.invoices.reduce(
+  // Filtrar las transacciones con status false
+  const filteredTransactions = req.body.invoices.filter(
+    (transaction) => !transaction.status
+  );
+
+  // Realizar las sumatorias solo con las transacciones filtradas
+  const totalQuantity = filteredTransactions.reduce(
     (total, trans) => total + trans.cantidad,
     0
   );
 
   const totalMontoUsd = parseFloat(
-    req.body.invoices
+    filteredTransactions
       .reduce((total, trans) => total + trans.montoTotalUsd, 0)
       .toFixed(2)
   );
 
   const totalMontoBs = parseFloat(
-    req.body.invoices
+    filteredTransactions
       .reduce((total, trans) => total + trans.montoTotalBs, 0)
       .toFixed(2)
   );
@@ -116,22 +122,25 @@ const createTransactionAsing = async (req, res) => {
       return res.status(500).json({ error: saveErr.message });
     }
 
-    const transactionsData = req.body.invoices.map((transaction) => {
-      const { idTransaction, id, ...transactionWithoutId } = transaction;
-      return {
-        ...transactionWithoutId,
-        fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
-      };
-    });
+    // Continuar con el procesamiento de las transacciones para insertarlas con status true
+    const transactionsData = req.body.invoices
+      .filter((transaction) => !transaction.status)
+      .map((transaction) => {
+        const { idTransaction, id, ...transactionWithoutId } = transaction;
+        return {
+          ...transactionWithoutId,
+          fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
+          status: true,
+        };
+      });
 
-    const transactions = await Transaction.bulkCreate(transactionsData);
-
-    const noteInvoices = await NoteInvoice.update(
-      { status: true },
-      { where: { note_number: transaction.facNDE } }
-    );
-
-    res.status(201).json(transactions);
+    if (transactionsData.length > 0) {
+      const transactions = await Transaction.bulkCreate(transactionsData);
+      res.status(201).json(transactions);
+    } else {
+      console.log("No transactions to insert due to status filter.");
+      res.status(204).send();
+    }
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: err.message });
