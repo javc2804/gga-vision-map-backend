@@ -84,6 +84,27 @@ export const exportProvidersToExcel = async (req, res) => {
   }
 };
 
+export const editProvider = async (req, res) => {
+  try {
+    const { id, name, user_rel } = req.body.data;
+
+    const provider = await Provider.findByPk(id);
+
+    if (!provider) {
+      return res.status(404).json({ error: "Provider not found" });
+    }
+
+    provider.name = name;
+    provider.user_rel = user_rel;
+
+    await provider.save();
+
+    res.status(200).json(provider);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export const createProvider = async (req, res) => {
   try {
     const { name, user_rel } = req.body.data;
