@@ -5,6 +5,9 @@ import { format } from "date-fns";
 export const getProviders = async (req, res) => {
   try {
     const providers = await Provider.findAll({
+      where: {
+        status: true, // Asegura que solo se incluyan los proveedores con status igual a true
+      },
       order: [["createdAt", "DESC"]], // Ordena por createdAt de forma descendente
     });
     res.status(200).json(providers);
@@ -105,6 +108,27 @@ export const editProvider = async (req, res) => {
   }
 };
 
+export const deleteProvider = async (req, res) => {
+  try {
+    const id = req.body.data;
+    const provider = await Provider.findByPk(id);
+
+    if (!provider) {
+      return res.status(404).json({ error: "Provider not found" });
+    }
+
+    // Cambiar el estado de true a false
+    provider.status = false;
+
+    // Guardar los cambios
+    await provider.save();
+
+    // Responder con un mensaje de éxito
+    res.status(200).json({ message: "Provider status updated successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 export const createProvider = async (req, res) => {
   try {
     const { name, user_rel } = req.body.data;
