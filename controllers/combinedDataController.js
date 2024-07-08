@@ -31,8 +31,11 @@ const getCombinedData = async (req, res) => {
       attributes: ["variant"],
     });
     const spareParts = await SparePart.findAll({ attributes: ["type"] });
-    const providers = await Provider.findAll(); // Fetch the providers
-
+    const providers = await Provider.findAll({
+      where: {
+        status: true,
+      },
+    });
     res.json({
       fleets,
       eje, // Include the unique eje values
