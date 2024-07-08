@@ -81,12 +81,10 @@ const createTransaction = async (req, res) => {
   }
 };
 const createTransactionAsing = async (req, res) => {
-  // Filtrar las transacciones con status false
   const filteredTransactions = req.body.invoices.filter(
     (transaction) => !transaction.status
   );
 
-  // Realizar las sumatorias solo con las transacciones filtradas
   const totalQuantity = filteredTransactions.reduce(
     (total, trans) => total + trans.cantidad,
     0
@@ -95,6 +93,16 @@ const createTransactionAsing = async (req, res) => {
   const totalMontoUsd = parseFloat(
     filteredTransactions
       .reduce((total, trans) => total + trans.montoTotalUsd, 0)
+      .toFixed(2)
+  );
+  const totalDeudaTotalUsd = parseFloat(
+    filteredTransactions
+      .reduce((total, trans) => {
+        return (
+          total +
+          (Number.isFinite(trans.deudaTotalUsd) ? trans.deudaTotalUsd : 0)
+        );
+      }, 0)
       .toFixed(2)
   );
 
@@ -111,8 +119,18 @@ const createTransactionAsing = async (req, res) => {
     if (!transaction) {
       return res.status(404).json({ error: "Transaction not found" });
     }
+
+    const allInvoicesAreCredit = filteredTransactions.every(
+      (trans) => trans.formaPago === "credito"
+    );
+
+    if (allInvoicesAreCredit) {
+      transaction.deudaTotalUsd -= totalDeudaTotalUsd;
+    } else {
+      transaction.montoTotalUsd -= totalMontoUsd;
+    }
+
     transaction.cantidad -= totalQuantity;
-    transaction.montoTotalUsd -= totalMontoUsd;
     transaction.montoTotalBs -= totalMontoBs;
 
     try {
@@ -383,7 +401,6 @@ const deleteTransaction = async (req, res) => {
 const getListTransaction = async (req, res) => {
   try {
     const { startDate, endDate, offset = 0, limit = 5, ...filters } = req.query;
-
     const cleanedFilters = Object.entries(filters).reduce(
       (acc, [key, value]) => {
         if (value !== "") {
@@ -438,8 +455,11 @@ const getListTransaction = async (req, res) => {
     // Crea una copia de 'where' sin el filtro 'repuesto'
     const whereForTotals = { ...where };
     delete whereForTotals.repuesto;
+    const filteredCategory = cleanedFilters.repuesto
+      ? [cleanedFilters.repuesto]
+      : categories;
 
-    for (let category of categories) {
+    for (let category of filteredCategory) {
       const sumCantidad =
         (await Transaction.sum("cantidad", {
           where: { ...whereForTotals, repuesto: category },

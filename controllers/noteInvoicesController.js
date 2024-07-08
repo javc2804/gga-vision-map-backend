@@ -113,6 +113,7 @@ export const getNoteInvoices = async (req, res) => {
           as: "fleet",
         },
       ],
+      order: [["createdAt", "DESC"]], // Ordena los resultados por 'createdAt' en orden descendente
     });
 
     const grouped = noteInvoices.reduce((result, current) => {
