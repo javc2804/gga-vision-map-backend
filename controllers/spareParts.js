@@ -31,6 +31,25 @@ export const getSpareParts = async (req, res) => {
   }
 };
 
+export const createSpareParts = async (req, res) => {
+  console.log(req.body);
+  return;
+
+  try {
+    const { name, type } = req.body;
+    console.log(name);
+    console.log(type);
+
+    // const newSparePart = await SparePart.create({
+    //   name,
+    //   type,
+    // });
+
+    res.status(201).json(newSparePart);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 export const exportSparePartsToExcel = async (req, res) => {
   try {
     const sparePartVariants = await SparePartVariant.findAll({
