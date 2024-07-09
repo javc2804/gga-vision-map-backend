@@ -144,6 +144,10 @@ const createTransactionAsing = async (req, res) => {
     const transactionsData = req.body.invoices
       .filter((transaction) => !transaction.status)
       .map((transaction) => {
+        if (transaction === "credito") {
+          delete transaction.precioUnitarioUsd;
+          delete transaction.montoTotalUsd;
+        }
         const { idTransaction, id, ...transactionWithoutId } = transaction;
         return {
           ...transactionWithoutId,

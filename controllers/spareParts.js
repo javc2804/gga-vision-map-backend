@@ -36,7 +36,7 @@ export const createSpareParts = async (req, res) => {
   return;
 
   try {
-    const { name, type } = req.body;
+    const { name, type } = req.body.data;
     console.log(name);
     console.log(type);
 
