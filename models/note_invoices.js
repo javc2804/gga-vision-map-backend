@@ -48,6 +48,9 @@ const NoteInvoice = sequelize.define("note_invoices", {
   marcaModelo: {
     type: Sequelize.STRING,
   },
+  inventario: {
+    type: Sequelize.STRING,
+  },
 });
 
 NoteInvoice.belongsTo(Fleet, {
