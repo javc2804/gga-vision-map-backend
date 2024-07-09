@@ -140,21 +140,30 @@ const createTransactionAsing = async (req, res) => {
       return res.status(500).json({ error: saveErr.message });
     }
 
-    // Continuar con el procesamiento de las transacciones para insertarlas con status true
-    const transactionsData = req.body.invoices
-      .filter((transaction) => !transaction.status)
-      .map((transaction) => {
-        if (transaction === "credito") {
-          delete transaction.precioUnitarioUsd;
-          delete transaction.montoTotalUsd;
-        }
-        const { idTransaction, id, ...transactionWithoutId } = transaction;
-        return {
-          ...transactionWithoutId,
-          fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
-          status: true,
-        };
+    for (const trans of filteredTransactions) {
+      const noteInvoice = await NoteInvoice.findOne({
+        where: { id: trans.id },
       });
+
+      if (noteInvoice) {
+        noteInvoice.status = true;
+        await noteInvoice.save();
+      }
+    }
+
+    const transactionsData = filteredTransactions.map((transaction) => {
+      if (transaction === "credito") {
+        delete transaction.precioUnitarioUsd;
+        delete transaction.montoTotalUsd;
+      }
+      const { idTransaction, id, ...transactionWithoutId } = transaction;
+      return {
+        ...transactionWithoutId,
+        ndeAlmacen: id,
+        fechaOcOs: new Date(transaction.fechaOcOs).toISOString(),
+        status: true,
+      };
+    });
 
     if (transactionsData.length > 0) {
       const transactions = await Transaction.bulkCreate(transactionsData);
