@@ -1,6 +1,23 @@
 import OutInternal from "../models/outInternal.js";
 import { Sequelize } from "sequelize";
 
+const formFieldOptions = [
+  { value: "", label: "Seleccione un tipo de gasto" }, // Opción por defecto
+  { value: "apoyoInstitucional", label: "Apoyo institucional" },
+  { value: "ayuda", label: "Ayuda" },
+  { value: "bolsaDeTrabajo", label: "Bolsa de trabajo" },
+  {
+    value: "bonoVarios",
+    label: "Bono (Coordinador, Vialidad, Recaudación y Apoyo Institucional)",
+  },
+  { value: "donacion", label: "Donación" },
+  { value: "honorarios", label: "Honorarios" },
+  { value: "viaticos", label: "Viáticos" },
+  { value: "funcionamiento", label: "Funcionamiento" },
+  { value: "nomina", label: "Nómina" },
+  { value: "bonoCoordinadores", label: "Bono coordinadores" },
+];
+
 const register = async (req, res) => {
   try {
     const preparedData = req.body.data.map((data) => {
@@ -48,8 +65,75 @@ const register = async (req, res) => {
 
 const list = async (req, res) => {
   try {
+    // Obtener todos los registros
     const records = await OutInternal.findAll();
-    res.status(200).json(records);
+
+    // Obtener sumatorias de montos por tipo de gasto para ambas monedas
+    const sumatorias = await OutInternal.findAll({
+      attributes: [
+        "tipoGasto",
+        [
+          Sequelize.fn("SUM", Sequelize.col("montoCompromisoBs")),
+          "totalMontoCompromisoBs",
+        ],
+        [
+          Sequelize.fn("SUM", Sequelize.col("montoPagadoBs")),
+          "totalMontoPagadoBs",
+        ],
+        [
+          Sequelize.fn("SUM", Sequelize.col("montoCompromisoUsd")),
+          "totalMontoCompromisoUsd",
+        ],
+        [
+          Sequelize.fn("SUM", Sequelize.col("montoPagadoUsd")),
+          "totalMontoPagadoUsd",
+        ],
+      ],
+      group: "tipoGasto",
+      raw: true,
+    });
+
+    // Convertir las sumatorias en un objeto para fácil acceso
+    const sumatoriasPorTipo = sumatorias.reduce(
+      (
+        acc,
+        {
+          tipoGasto,
+          totalMontoCompromisoBs,
+          totalMontoPagadoBs,
+          totalMontoCompromisoUsd,
+          totalMontoPagadoUsd,
+        }
+      ) => {
+        acc[tipoGasto] = {
+          totalMontoCompromisoBs: parseFloat(totalMontoCompromisoBs),
+          totalMontoPagadoBs: parseFloat(totalMontoPagadoBs),
+          totalMontoCompromisoUsd: parseFloat(totalMontoCompromisoUsd),
+          totalMontoPagadoUsd: parseFloat(totalMontoPagadoUsd),
+        };
+        return acc;
+      },
+      {}
+    );
+
+    // Preparar el objeto de respuesta
+    const respuesta = {
+      row: records, // Todos los registros
+      sumatorias: formFieldOptions.reduce((acc, { value }) => {
+        if (value) {
+          // Ignorar la opción por defecto
+          acc[value] = sumatoriasPorTipo[value] || {
+            totalMontoCompromisoBs: 0,
+            totalMontoPagadoBs: 0,
+            totalMontoCompromisoUsd: 0,
+            totalMontoPagadoUsd: 0,
+          };
+        }
+        return acc;
+      }, {}),
+    };
+
+    res.status(200).json(respuesta);
   } catch (error) {
     res.status(500).json({
       message: "Error al obtener los registros",
@@ -57,5 +141,4 @@ const list = async (req, res) => {
     });
   }
 };
-
 export default { register, list };
