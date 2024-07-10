@@ -49,11 +49,11 @@ OutInternal.init(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
-    montoCompromisoUSD: {
+    montoCompromisoUsd: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
-    montoPagadoUSD: {
+    montoPagadoUsd: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
