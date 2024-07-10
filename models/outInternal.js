@@ -5,133 +5,65 @@ class OutInternal extends Model {}
 
 OutInternal.init(
   {
-    proveedor_beneficiario: {
+    proveedorBeneficiario: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    mantenimiento_adquisicion: {
-      type: DataTypes.DECIMAL(10, 2),
+    descripcionGasto: {
+      type: DataTypes.TEXT,
       allowNull: true,
     },
-    monto_factura_bs_mantenimiento: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
-    },
-    monto_pagado_bolivares_mantenimiento: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
-    },
-    monto_factura_dolares_mantenimiento: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
-    },
-    monto_pagado_dolares_mantenimiento: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
-    },
-    beneficiario_gasto_personal: {
+    tipoGasto: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    gasto_personal: {
+    fechaFactura: {
+      type: DataTypes.DATEONLY,
+      allowNull: true,
+    },
+    tasaBcv: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    fechaTasa: {
+      type: DataTypes.DATEONLY,
+      allowNull: true,
+    },
+    ordenPagoNumero: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    monto_pagado_bs_personal: {
-      type: DataTypes.DECIMAL(10, 2),
+    fechaPago: {
+      type: DataTypes.DATEONLY,
       allowNull: true,
     },
-    monto_pagado_dolares_personal: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
-    },
-    beneficiario_donaciones: {
+    relacionMesPago: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    donaciones: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    monto_pagado_bolivares_donaciones: {
+    montoCompromisoBs: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
-    monto_pagado_dolares_donaciones: {
+    montoPagadoBs: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
-    impuestos: {
+    montoCompromisoUSD: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
-    monto_pagado_bolivares_impuesto: {
+    montoPagadoUSD: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
-    },
-    monto_pagado_dolares_impuesto: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
-    },
-    aportes: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
-    },
-    monto_pagado_bs_aportes: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
-    },
-    monto_pagado_dolares_aportes: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
-    },
-    num_factura: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    fecha_factura: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
-    num_referencia: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    cuenta_bancaria: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    tasa_bcv: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
-    },
-    fecha_tasa: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
-    num_orden_pago: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    fecha_pago: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
-    relacion_mes_pago: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    observacion: {
-      type: DataTypes.STRING,
-      allowNull: true, // Asumiendo que la observación puede ser opcional
     },
     status: {
       type: DataTypes.BOOLEAN,
-      allowNull: true, // Asumiendo que la observación puede ser opcional
+      allowNull: true,
     },
     user_rel: {
       type: DataTypes.STRING,
-      allowNull: true, // Asumiendo que la observación puede ser opcional
+      allowNull: true,
     },
   },
   {

@@ -4,38 +4,31 @@ import { Sequelize } from "sequelize";
 const register = async (req, res) => {
   try {
     const preparedData = req.body.data.map((data) => {
-      if (
-        data.fecha_tasa &&
-        !isNaN(new Date(data.fecha_tasa + "T00:00:00").getTime())
-      ) {
-        data.fecha_tasa = new Date(data.fecha_tasa + "T00:00:00");
-      } else {
-        data.fecha_tasa = null; // O manejar de otra manera
-      }
+      // Convertir fechas a objetos Date de JavaScript
+      data.fechaTasa = data.fechaTasa ? new Date(data.fechaTasa) : null;
+      data.fechaPago = data.fechaPago ? new Date(data.fechaPago) : null;
+      data.fechaFactura = data.fechaFactura
+        ? new Date(data.fechaFactura)
+        : null;
 
-      // Repetir para fecha_factura y fecha_pago con la misma lógica
-      if (
-        data.fecha_factura &&
-        !isNaN(new Date(data.fecha_factura + "T00:00:00").getTime())
-      ) {
-        data.fecha_factura = new Date(data.fecha_factura + "T00:00:00");
-      } else {
-        data.fecha_factura = null; // O manejar de otra manera
-      }
+      // Convertir strings numéricos a números
+      data.montoPagadoBs = parseFloat(data.montoPagadoBs);
+      data.montoCompromisoUsd = parseFloat(data.montoCompromisoUsd);
+      data.montoCompromisoBs = parseFloat(data.montoCompromisoBs);
+      data.montoPagadoUsd = parseFloat(data.montoPagadoUsd);
+      data.tasaBcv = parseFloat(data.tasaBcv);
 
-      if (
-        data.fecha_pago &&
-        !isNaN(new Date(data.fecha_pago + "T00:00:00").getTime())
-      ) {
-        data.fecha_pago = new Date(data.fecha_pago + "T00:00:00");
-      } else {
-        data.fecha_pago = null; // O manejar de otra manera
-      }
+      // Asegurarse de que los campos que no necesitan transformación estén correctamente asignados
+      data.id_items = data.id_items;
+      data.proveedorBeneficiario = data.proveedorBeneficiario;
+      data.descripcionGasto = data.descripcionGasto;
+      data.ordenPagoNumero = data.ordenPagoNumero;
+      data.relacionMesPago = data.relacionMesPago;
+      data.tipoGasto = data.tipoGasto;
+      data.user_rel = data.user_rel;
 
       return data;
     });
-
-    console.log(preparedData);
 
     const results = await OutInternal.bulkCreate(preparedData, {
       validate: true,
