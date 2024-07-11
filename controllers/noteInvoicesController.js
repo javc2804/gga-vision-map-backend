@@ -8,6 +8,7 @@ import NoteInvoice from "../models/note_invoices.js";
 // import pdfMake from "pdfmake/build/pdfmake.js";
 // import pdfFonts from "pdfmake/build/vfs_fonts.js";
 import Inventory from "../models/inventory.js";
+import HistoryInventory from "../models/HistoryInventory.js";
 // pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import PDFDocument from "pdfkit";
@@ -27,6 +28,10 @@ export const createNoteInvoice = async (req, res) => {
       rest.note_number = commonId;
       return { ...rest };
     });
+
+    const historyInventories = await HistoryInventory.bulkCreate(
+      dataWithoutIds
+    );
 
     for (const item of dataWithoutIds) {
       if (!item.spare_part_variant) {
@@ -195,21 +200,22 @@ export const getNoteInvoicePDF = async (req, res) => {
   currentY += 20; // Espacio para la siguiente fila
 
   // Dibujar filas de la tabla
+
   req.body.invoices.forEach((invoice, index) => {
     let offsetX = 0;
-    doc.text(invoice.id, 50 + offsetX, currentY);
-    offsetX += 100; // Ajustar según el ancho de la columna
-    doc.text(invoice.ut, 50 + offsetX, currentY);
+    // doc.text(invoice.id, 50 + offsetX, currentY);
+    // offsetX += 100; // Ajustar según el ancho de la columna
+    doc.text(invoice.fleet.ut, 50 + offsetX, currentY);
     offsetX += 100;
-    doc.text(invoice.marcaModelo, 50 + offsetX, currentY);
+    doc.text(invoice.fleet.marcaModelo, 50 + offsetX, currentY);
     offsetX += 100;
-    doc.text(invoice.eje, 50 + offsetX, currentY);
+    doc.text(invoice.fleet.eje, 50 + offsetX, currentY);
     offsetX += 100;
-    doc.text(invoice.subeje, 50 + offsetX, currentY);
+    doc.text(invoice.fleet.subeje, 50 + offsetX, currentY);
     offsetX += 100;
     doc.text(invoice.descripcion, 50 + offsetX, currentY);
     offsetX += 100;
-    doc.text(invoice.cantidad, 50 + offsetX, currentY);
+    doc.text(invoice.quantity, 50 + offsetX, currentY);
     offsetX += 100;
     doc.text(invoice.observation, 50 + offsetX, currentY);
     currentY += 20; // Espacio para la siguiente fila

@@ -137,6 +137,11 @@ const login = async (req, res) => {
                   route: "/note-invoices-list",
                 },
                 { name: "Inventario", icon: "Inventory", route: "/inventory" },
+                {
+                  name: "Historial",
+                  icon: "Inventory",
+                  route: "/inventory-history",
+                },
               ],
             },
           ];
