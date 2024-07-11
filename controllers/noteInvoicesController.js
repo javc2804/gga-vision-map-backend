@@ -174,6 +174,12 @@ export const getNoteInvoicePDF = async (req, res) => {
   doc.pipe(fs.createWriteStream("output.pdf"));
 
   const imagePath = path.join(__dirname, "..", "public", "logo.png");
+  const signaturePath = path.join(__dirname, "..", "public", "firma.jpg");
+
+  const signatureWidth = 100; // Ancho de la imagen de la firma
+  const pageWidth = 612; // Ancho de una página tamaño carta
+  const startX = (pageWidth - signatureWidth) / 2;
+
   doc.image(imagePath, 50, 50, { width: 100 });
 
   // Título
@@ -220,6 +226,12 @@ export const getNoteInvoicePDF = async (req, res) => {
     doc.text(invoice.observation, 50 + offsetX, currentY);
     currentY += 20; // Espacio para la siguiente fila
   });
+
+  // Puedes ajustar este valor según sea necesario
+  currentY += 20; // Espacio adicional antes de la firma si es necesario
+
+  // Añadir la imagen de la firma al documento, centrada y al final
+  doc.image(signaturePath, startX, currentY, { width: signatureWidth });
 
   doc.end();
 
