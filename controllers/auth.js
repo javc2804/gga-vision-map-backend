@@ -78,73 +78,78 @@ const login = async (req, res) => {
         if (err) throw err;
 
         let menu;
-        if (user.role === "admin") {
-          menu = [
-            {
-              name: "Gastos",
-              icon: "Money",
-              subMenu: [
-                { name: "Lista NDE", icon: "ListAlt", route: "/" },
-                {
-                  name: "Mantenimiento",
-                  icon: "AddBox",
-                  route: "/register-out/",
-                },
-                {
-                  name: "Listado de mantenimiento",
-                  icon: "List",
-                  route: "/list-purchases",
-                },
-                {
-                  name: "Gastos administrativos",
-                  icon: "List",
-                  route: "/register-internal",
-                },
-                {
-                  name: "Listado de gastos administrativos",
-                  icon: "List",
-                  route: "/list-internal",
-                },
-                { name: "Gráficos", icon: "BarChart", route: "/graphs-out" },
-              ],
-            },
+        const operatorMenu = [
+          {
+            name: "Gastos",
+            icon: "Money",
+            subMenu: [
+              { name: "Lista NDE", icon: "ListAlt", route: "/" },
+              {
+                name: "Gastos operativos",
+                icon: "AddBox",
+                route: "/register-out/",
+              },
+              {
+                name: "Matriz gastos operativos",
+                icon: "List",
+                route: "/list-purchases",
+              },
+              {
+                name: "Gastos administrativos",
+                icon: "List",
+                route: "/register-internal",
+              },
+              {
+                name: "Listado de gastos administrativos",
+                icon: "List",
+                route: "/list-internal",
+              },
+              { name: "Gráficos", icon: "BarChart", route: "/graphs-out" },
+            ],
+          },
+          {
+            name: "Gestion de usuarios",
+            icon: "PeopleOutline",
+            route: "/users",
+          },
+          {
+            name: "Gestión de Proveedores",
+            icon: "Suppliers",
+            route: "/providers",
+          },
+          {
+            name: "Gestión de Repuestos",
+            icon: "AutoParts",
+            route: "/spareparts",
+          },
+        ];
 
-            {
-              name: "Gestion de usuarios",
-              icon: "PeopleOutline",
-              route: "/users",
-            },
-            {
-              name: "Gestión de Proveedores",
-              icon: "Suppliers",
-              route: "/providers",
-            },
-            {
-              name: "Gestión de Repuestos",
-              icon: "AutoParts",
-              route: "/spareparts",
-            },
-          ];
+        const storeMenu = [
+          {
+            name: "Almacén",
+            icon: "HomeWorkIcon",
+            subMenu: [
+              {
+                name: "Listar Notas",
+                icon: "Inventory",
+                route: "/note-invoices-list",
+              },
+              { name: "Inventario", icon: "Inventory", route: "/inventory" },
+              {
+                name: "Historial",
+                icon: "Inventory",
+                route: "/inventory-history",
+              },
+            ],
+          },
+        ];
+
+        if (user.role === "operator") {
+          menu = operatorMenu;
         } else if (user.role === "store") {
-          menu = [
-            {
-              name: "Almacén",
-              icon: "HomeWorkIcon",
-              subMenu: [
-                {
-                  name: "Listar Notas",
-                  icon: "Inventory",
-                  route: "/note-invoices-list",
-                },
-                { name: "Inventario", icon: "Inventory", route: "/inventory" },
-                {
-                  name: "Historial",
-                  icon: "Inventory",
-                  route: "/inventory-history",
-                },
-              ],
-            },
-          ];
+          menu = storeMenu;
+        } else if (user.role === "admin") {
+          menu = [...operatorMenu, ...storeMenu];
         }
 
         res.json({
