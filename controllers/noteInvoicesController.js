@@ -171,70 +171,101 @@ export const getNoteInvoices = async (req, res) => {
 
 export const getNoteInvoicePDF = async (req, res) => {
   const doc = new PDFDocument();
-  doc.pipe(fs.createWriteStream("output.pdf"));
+  res.setHeader("Content-Type", "application/pdf");
+  doc.pipe(res);
 
   const imagePath = path.join(__dirname, "..", "public", "logo.png");
   const signaturePath = path.join(__dirname, "..", "public", "firma.jpg");
 
-  const signatureWidth = 100; // Ancho de la imagen de la firma
-  const pageWidth = 612; // Ancho de una página tamaño carta
-  const startX = (pageWidth - signatureWidth) / 2;
+  // Añadir imagen del logo
+  doc.image(imagePath, 30, 50, { width: 100 });
+  // Añadir título
+  doc.fontSize(12).text("Asignaciones:", 30, 150);
 
-  doc.image(imagePath, 50, 50, { width: 100 });
-
-  // Título
-  doc.fontSize(12).text("Asignaciones:", 50, 150);
-
-  // Cabeceras de la tabla
-  const headers = [
-    "UT",
-    "Modelo",
-    "Eje",
-    "SUB-EJE",
-    "DESCRIPCION",
-    "CANTIDAD",
-    "CODIGO DE LOS CAUCHOS",
-  ];
+  // Encabezados de la tabla
+  const headers = ["Ut", "Modelo", "Eje", "Sub-eje", "Descripción", "Cantidad"];
   const startY = 170;
   let currentY = startY;
 
-  // Dibujar cabeceras
+  // Dibujar encabezados
   headers.forEach((header, index) => {
-    doc.text(header, 50 + index * 100, currentY);
+    doc.text(header, 30 + index * 100, currentY, {
+      width: 90,
+      align: "center",
+    });
   });
 
   currentY += 20; // Espacio para la siguiente fila
 
   // Dibujar filas de la tabla
-
-  req.body.invoices.forEach((invoice, index) => {
-    let offsetX = 0;
-    // doc.text(invoice.id, 50 + offsetX, currentY);
-    // offsetX += 100; // Ajustar según el ancho de la columna
-    doc.text(invoice.fleet.ut, 50 + offsetX, currentY);
-    offsetX += 100;
-    doc.text(invoice.fleet.marcaModelo, 50 + offsetX, currentY);
-    offsetX += 100;
-    doc.text(invoice.fleet.eje, 50 + offsetX, currentY);
-    offsetX += 100;
-    doc.text(invoice.fleet.subeje, 50 + offsetX, currentY);
-    offsetX += 100;
-    doc.text(invoice.descripcion, 50 + offsetX, currentY);
-    offsetX += 100;
-    doc.text(invoice.quantity, 50 + offsetX, currentY);
-    offsetX += 100;
-    doc.text(invoice.observation, 50 + offsetX, currentY);
+  req.body.invoices.forEach((invoice) => {
+    headers.forEach((_, colIndex) => {
+      let text = "";
+      switch (colIndex) {
+        case 0:
+          text = invoice.fleet.ut;
+          break;
+        case 1:
+          text = invoice.fleet.marcaModelo;
+          break;
+        case 2:
+          text = invoice.fleet.eje;
+          break;
+        case 3:
+          text = invoice.fleet.subeje;
+          break;
+        case 4:
+          text = invoice.descripcion;
+          break;
+        case 5:
+          text = invoice.quantity.toString();
+          break;
+        case 6:
+          text = invoice.observation;
+          break;
+      }
+      doc.text(text, 30 + colIndex * 100, currentY, {
+        width: 90,
+        align: "center",
+      }); // Asegurar que el texto se añade horizontalmente
+    });
     currentY += 20; // Espacio para la siguiente fila
   });
 
-  // Puedes ajustar este valor según sea necesario
-  currentY += 20; // Espacio adicional antes de la firma si es necesario
+  // Dibujar líneas de la tabla
+  doc
+    .moveTo(30, startY)
+    .lineTo(30 + 100 * headers.length, startY)
+    .stroke();
+  doc
+    .moveTo(30, startY + 20)
+    .lineTo(30 + 100 * headers.length, startY + 20)
+    .stroke();
 
-  // Añadir la imagen de la firma al documento, centrada y al final
-  doc.image(signaturePath, startX, currentY, { width: signatureWidth });
+  for (let i = 0; i <= headers.length; i++) {
+    doc
+      .moveTo(30 + i * 100, startY)
+      .lineTo(30 + i * 100, currentY)
+      .stroke();
+  }
 
+  req.body.invoices.forEach((_, index) => {
+    doc
+      .moveTo(30, startY + 20 * (index + 1))
+      .lineTo(30 + 100 * headers.length, startY + 20 * (index + 1))
+      .stroke();
+    doc
+      .moveTo(30, startY + 20 * (index + 2))
+      .lineTo(30 + 100 * headers.length, startY + 20 * (index + 2))
+      .stroke();
+  });
+
+  // Añadir firma
+  const signatureWidth = 100;
+  const pageWidth = 612;
+  const startX = (pageWidth - signatureWidth) / 2;
+  doc.image(signaturePath, startX, currentY + 20, { width: signatureWidth });
+
+  // Finalizar documento
   doc.end();
-
-  res.setHeader("Content-Type", "application/pdf");
-  doc.pipe(res);
 };
