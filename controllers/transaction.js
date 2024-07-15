@@ -83,7 +83,9 @@ const createTransaction = async (req, res) => {
 const createTransactionAsing = async (req, res) => {
   const filteredTransactions = req.body.invoices.filter(
     (transaction) =>
-      !transaction.status && transaction.inventario !== "anteriores"
+      !transaction.status &&
+      transaction.inventario !== "anteriores" &&
+      transaction.processed
   );
 
   const totalQuantity = filteredTransactions.reduce(
