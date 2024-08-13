@@ -154,8 +154,31 @@ const createTransactionAsing = async (req, res) => {
       }
     }
 
+    for (const trans of req.body.invoices) {
+      if (!trans.processed) {
+        const noteInvoice = await NoteInvoice.findOne({
+          where: { id: trans.id },
+        });
+
+        if (noteInvoice) {
+          noteInvoice.returned = true;
+          await noteInvoice.save();
+
+          const inventoryItem = await Inventory.findOne({
+            where: { descripcion: trans.spare_part_variant },
+          });
+
+          if (inventoryItem) {
+            inventoryItem.cantidad += trans.cantidad;
+            inventoryItem.salida -= trans.cantidad;
+            await inventoryItem.save();
+          }
+        }
+      }
+    }
+
     const transactionsData = filteredTransactions.map((transaction) => {
-      if (transaction === "credito") {
+      if (transaction.formaPago === "credito") {
         delete transaction.precioUnitarioUsd;
         delete transaction.montoTotalUsd;
       }

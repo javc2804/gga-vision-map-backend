@@ -30,11 +30,7 @@ const NoteInvoice = sequelize.define("note_invoices", {
     type: Sequelize.STRING,
     allowNull: false,
   },
-  status: {
-    type: Sequelize.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
-  },
+
   ut: {
     type: Sequelize.STRING,
     allowNull: false,
@@ -50,6 +46,16 @@ const NoteInvoice = sequelize.define("note_invoices", {
   },
   inventario: {
     type: Sequelize.STRING,
+  },
+  returned: {
+    type: Sequelize.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
+  status: {
+    type: Sequelize.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
   },
 });
 

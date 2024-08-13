@@ -110,6 +110,9 @@ export const getNoteInvoices = async (req, res) => {
     const offset = (page - 1) * limit;
 
     const { count, rows: noteInvoices } = await NoteInvoice.findAndCountAll({
+      where: {
+        returned: false,
+      },
       limit: limit,
       offset: offset,
       include: [

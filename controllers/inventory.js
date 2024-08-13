@@ -34,33 +34,38 @@ const updateInventoryQuantity = async (req, res) => {
   try {
     // Extraer el objeto description del cuerpo de la solicitud
     const { description } = req.body;
-    const { id, name: additionalQuantity } = description;
+    const { name, cantidad, user_rel } = description;
 
-    // Buscar el registro de inventario por ID
-    const inventoryItem = await Inventory.findByPk(id);
-    if (!inventoryItem) {
-      return res
-        .status(404)
-        .json({ error: "Registro de inventario no encontrado" });
+    // Buscar el registro de inventario por name
+    let inventoryItem = await Inventory.findOne({
+      where: { descripcion: name },
+    });
+
+    if (inventoryItem) {
+      // Si el registro existe, sumar la cantidad proporcionada
+      const newQuantity = inventoryItem.cantidad + Number(cantidad);
+      await inventoryItem.update({ cantidad: newQuantity });
+    } else {
+      // Si el registro no existe, crear uno nuevo
+      inventoryItem = await Inventory.create({
+        descripcion: name,
+        entrada: 0,
+        salida: 0,
+        proveedor: "Anteriores",
+        cantidad: Number(cantidad),
+        user_rel,
+      });
     }
 
-    // Convertir name a número y sumarlo a la cantidad actual
-    const newQuantity = inventoryItem.cantidad + Number(additionalQuantity);
-
-    // Actualizar la cantidad en el registro
-    await inventoryItem.update({ cantidad: newQuantity });
-
-    res
-      .status(200)
-      .json({ message: "Cantidad actualizada con éxito", inventoryItem });
+    res.status(200).json({
+      message: "Operación realizada con éxito",
+      inventoryItem,
+    });
   } catch (err) {
     console.error(err);
-    res
-      .status(500)
-      .json({ error: "Error al actualizar la cantidad del inventario" });
+    res.status(500).json({ error: "Error al procesar la solicitud" });
   }
 };
-
 export const getHistoryInventories = async (req, res) => {
   try {
     // Opcional: Añade lógica para manejar filtros de búsqueda si es necesario
