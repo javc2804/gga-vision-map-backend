@@ -47,4 +47,7 @@ sequelize
   .then(() => console.log("Tablas creadas"))
   .catch((error) => console.log(error));
 
-app.listen(3000 || 3200, () => console.log("Server running on port 3000"));
+// Usa la variable de entorno PORT o por defecto el puerto 3000
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
