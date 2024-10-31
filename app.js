@@ -20,14 +20,24 @@ import path from "path";
 
 const app = express();
 
-app.use(cors());
+// Configuración de CORS
+const corsOptions = {
+  origin: "*", // Permitir todas las solicitudes
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Sincronización de la tabla note_invoices
 NoteInvoice.sync()
   .then(() => console.log('Table "note_invoices" has been created.'))
   .catch((error) => console.log("An error occurred:", error));
 
+// Rutas
 app.use("/auth", authRoutes);
 app.use("/transaction", transactionRoutes);
 app.use("/upload", uploadRoutes);
@@ -41,10 +51,13 @@ app.use("/out-internal", outInternalRoutes);
 app.use("/spare-parts", sparePartsRoutes);
 app.use("/inventory", inventoryRoutes);
 
+// Sincronización de Sequelize
 sequelize
-  // .sync({ force: true })
+  // .sync({ force: true }) // Descomentar para forzar la recreación de las tablas
   .sync()
   .then(() => console.log("Tablas creadas"))
   .catch((error) => console.log(error));
 
-app.listen(3000, () => console.log("Server running on port 3000"));
+// Iniciar el servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
