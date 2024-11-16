@@ -51,6 +51,9 @@ app.use("/out-internal", outInternalRoutes);
 app.use("/spare-parts", sparePartsRoutes);
 app.use("/inventory", inventoryRoutes);
 
+// Servir archivos estáticos de la carpeta dist
+app.use(express.static(path.join(__dirname, "dist")));
+
 // Sincronización de Sequelize
 sequelize
   // .sync({ force: true }) // Descomentar para forzar la recreación de las tablas
