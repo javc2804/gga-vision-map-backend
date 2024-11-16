@@ -55,8 +55,8 @@ app.use("/out-internal", outInternalRoutes);
 app.use("/spare-parts", sparePartsRoutes);
 app.use("/inventory", inventoryRoutes);
 
-// Servir archivos estáticos de la carpeta dist
-app.use(express.static(path.join(__dirname, "dist")));
+// Servir archivos estáticos de la carpeta dist del frontend
+app.use(express.static(path.join(__dirname, "../home/transmiranda/gga-vision-map-frontend/dist")));
 
 // Sincronización de Sequelize
 sequelize
