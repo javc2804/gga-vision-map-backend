@@ -11,45 +11,59 @@ export const getSpareParts = async (req, res) => {
         {
           model: SparePart,
           as: "sparePart",
-          attributes: [[Sequelize.literal(`"sparePart"."type"`), "type"]], // Utiliza Sequelize.literal para seleccionar directamente el campo 'type'
+          attributes: ["partType"], // Usa el nombre correcto de la columna
         },
       ],
       attributes: {
         exclude: ["sparepartid"],
-        include: [[Sequelize.literal(`"sparePart"."type"`), "type"]], // Incluye el valor de 'type' directamente en los resultados
+        include: [[Sequelize.literal(`"sparePart"."partType"`), "type"]], // Usa el nombre correcto de la columna
       },
     });
 
+    console.log("sparePartVariants", sparePartVariants);
+
     const modifiedResults = sparePartVariants.map((variant) => ({
       ...variant.toJSON(),
-      type: variant.sparePart.type, // Asegúrate de ajustar esta línea según la estructura real de tus datos
+      type: variant.sparePart.partType, // Ajusta según la estructura real de tus datos
     }));
+
+    console.log("modifiedResults", modifiedResults);
 
     res.status(200).json(modifiedResults);
   } catch (error) {
+    console.error("Error fetching spare parts:", error);
     res.status(500).json({ error: error.message });
   }
 };
 
 export const createSpareParts = async (req, res) => {
-  console.log(req.body);
-  return;
-
   try {
-    const { name, type } = req.body.data;
+    const { name, spareParts_variant, user_rel } = req.body.data; // Asegúrate de que los nombres de los atributos coincidan
     console.log(name);
-    console.log(type);
+    console.log(spareParts_variant);
+    console.log(user_rel);
+    // Crear el nuevo SparePart
+    const newSparePart = await SparePart.create({
+      name,
+      partType: spareParts_variant, // Ajusta según la estructura real de tus datos
+    });
 
-    // const newSparePart = await SparePart.create({
-    //   name,
-    //   type,
-    // });
+    console.log("newSparePart", newSparePart);
+    // Crear el nuevo SparePartVariant
+    const newSparePartVariant = await SparePartVariant.create({
+      variant: spareParts_variant,
+      status: "active", // Ajusta según sea necesario
+      sparepartid: 1,
+      userid: 1, // Ajusta según la estructura real de tus datos
+    });
+    console.log("newSparePartVariant", newSparePartVariant);
 
-    res.status(201).json(newSparePart);
+    res.status(201).json({ newSparePart, newSparePartVariant });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 export const exportSparePartsToExcel = async (req, res) => {
   try {
     const sparePartVariants = await SparePartVariant.findAll({
@@ -57,7 +71,7 @@ export const exportSparePartsToExcel = async (req, res) => {
         {
           model: SparePart,
           as: "sparePart",
-          attributes: ["type"], // Asegurarse de que 'type' es el campo correcto
+          attributes: ["partType"], // Usa el nombre correcto de la columna
         },
       ],
       raw: true,
@@ -101,7 +115,7 @@ export const exportSparePartsToExcel = async (req, res) => {
       const row = index + 2;
       ws.cell(row, 1).number(variant.id);
       ws.cell(row, 2).string(format(new Date(variant.createdAt), "dd/MM/yyyy"));
-      ws.cell(row, 3).string(variant.sparePart.type || ""); // Usa 'type' para 'Descripción de Repuesto'
+      ws.cell(row, 3).string(variant.sparePart.partType || ""); // Usa el nombre correcto de la columna
       ws.cell(row, 4).string(variant.variant || ""); // Usa el valor actual para 'Repuesto'
       ws.cell(row, 5).string(variant.userid || "");
       ws.cell(row, 6).string(variant.status || "");

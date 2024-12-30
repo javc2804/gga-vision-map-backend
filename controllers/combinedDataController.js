@@ -30,19 +30,26 @@ const getCombinedData = async (req, res) => {
     const sparePartVariants = await SparePartVariant.findAll({
       attributes: ["variant"],
     });
-    const spareParts = await SparePart.findAll({ attributes: ["type"] });
+    const spareParts = await SparePart.findAll({ attributes: ["name"] }); // Ajusta la consulta para obtener 'partType'
     const providers = await Provider.findAll({
       where: {
         status: true,
       },
     });
+
+    const sparePartsAsType = spareParts.map((sparePart) => {
+      return {
+        type: sparePart.name,
+      };
+    });
+
     res.json({
       fleets,
       eje, // Include the unique eje values
       subeje, // Include the unique subeje values
       paymentTypes,
       sparePartVariants,
-      spareParts,
+      spareParts: sparePartsAsType, // Enviar 'spareParts' como 'type'
       providers, // Include the providers in the response
     });
   } catch (error) {

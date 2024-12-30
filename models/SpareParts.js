@@ -5,16 +5,19 @@ class SparePart extends Model {}
 
 SparePart.init(
   {
-    // Define los atributos del modelo aquí, por ejemplo:
     name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    // Añade más atributos según sea necesario
+    partType: {
+      // Asegúrate de que el atributo partType esté definido
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   },
   {
-    sequelize, // Instancia de conexión
-    modelName: "SparePart", // Nombre del modelo
+    sequelize,
+    modelName: "SparePart",
   }
 );
 
